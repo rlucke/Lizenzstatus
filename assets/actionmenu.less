@@ -13,6 +13,20 @@
 
         position: relative;
         cursor: pointer;
+        img.license {
+            display: inline-block;
+        }
+        img.decline {
+            display: none;
+        }
+    }
+    &.active .action-menu-icon {
+        img.license {
+            display: none;
+        }
+        img.decline {
+            display: inline-block;
+        }
     }
 
     .action-menu-content {
@@ -79,70 +93,6 @@
         }
         .action-menu-icon {
             z-index: 3;
-        }
-    }
-
-    // Create animated icon that changes to close icon on activation/hover
-    html.csstransforms & {
-        .action-menu-icon div {
-            .square((@icon-size / 4));
-            .translate((-(@icon-size / 8)), 0);
-            .transition(all .25s ease-in-out);
-
-            display: block;
-            position: absolute;
-            background:  @base-color;
-            border-radius: 50%;
-            opacity: 1;
-            left: 50%;
-
-            &:nth-child(1) {
-                top: 0px;
-            }
-
-            &:nth-child(2) {
-                top: (@icon-size / 2);
-                .translate((-(@icon-size / 8)), (-(@icon-size / 8)));
-            }
-
-            &:nth-child(3) {
-                bottom: 0;
-            }
-        }
-    }
-    html.csstransforms &.active, html.no-js &:hover {
-        .action-menu-icon div {
-            border-radius: 0;
-
-            &:nth-child(1) {
-                left: 0;
-                .transform(rotate(45deg), translate(((@icon-size / 4) + 0.5), ((@icon-size / 4) + 0.5)));
-                width: 100%;
-            }
-
-            &:nth-child(2) {
-                opacity: 0;
-            }
-
-            &:nth-child(3) {
-                left: 0;
-                .transform(rotate(-45deg), translate((@icon-size / 4), (-(@icon-size / 4))));
-                width: 100%;
-            }
-        }
-    }
-
-    // Icon file fallback for old browsers
-    html:not(.csstransforms) & .action-menu-icon {
-        .background-icon('mobile-sidebar', 'clickable', @icon-size);
-
-        div {
-            display: none;
-        }
-    }
-    html:not(.csstransforms) &.active, html.no-js:not(.csstransforms) &:hover {
-        .action-menu-icon {
-            .background-icon('decline', 'clickable', @icon-size);
         }
     }
 

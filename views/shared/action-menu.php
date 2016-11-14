@@ -13,14 +13,13 @@ $attributes = function (array $attributes) {
 };
 ?>
 <nav class="lizenzstatus-action-menu">
-    <div class="action-menu-icon" title="<?= _('Aktionen') ?>">
-        <div></div>
-        <div></div>
-        <div></div>
+    <div class="action-menu-icon" title="<?= htmlReady($title ?: _('Aktionen')) ?>">
+        <img src="<?= htmlReady($icon) ?>" width="20px" height="20px" class="license">
+        <?= Assets::img("icons/20/blue/decline", array('class' => "decline")) ?>
     </div>
     <div class="action-menu-content">
         <div class="action-menu-title">
-            <?= _('Aktionen') ?>
+            <?= _('Lizenz auswählen') ?>
         </div>
         <ul class="action-menu-list">
         <? foreach ($actions as $action): ?>
@@ -28,7 +27,7 @@ $attributes = function (array $attributes) {
             <? if ($action['type'] === 'link'): ?>
                 <a href="<?= $action['link'] ?>" <?= $attributes($action['attributes']) ?>>
                 <? if ($action['icon']): ?>
-                    <?= $action['icon'] ?>
+                    <img src="<?= htmlReady($action['icon']) ?>" height="20px">
                 <? else: ?>
                     <span class="action-menu-no-icon"></span>
                 <? endif; ?>

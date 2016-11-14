@@ -72,43 +72,24 @@
                     <? if ($access) : ?>
                         <?
                             $actionmenu = MyProtectedFiles\ActionMenu::get();
+                            $actionmenu->icon = $icons[$file['protected']];
                             foreach ($licenses as $license) {
-                                $actionmenu->addButton("license_id", $license['name'], null, array('value' => $license['license_id']));
+                                if ($license['license_id'] > 1) {
+                                    $actionmenu->addLink(
+                                        "#",
+                                        $license['name'],
+                                        $icons[$license['license_id']],
+                                        array(
+                                            'onclick' => "STUDIP.Lizenzstatus.toggle.call(this, '" . $license['license_id'] . "'); return false;"
+                                        )
+                                    );
+                                }
+                                if ($license['license_id'] == $file['protected']) {
+                                    $actionmenu->title = $license['name'];
+                                }
                             }
                             echo $actionmenu->render();
                         ?>
-                    <a href="#" class="license-chooser license_<?= htmlReady($file['protected']) ?>" onClick="STUDIP.MyProtectedFiles.toggle.call(this); return false;">
-                        <? foreach ($licenses as $license) : ?>
-                            <span class="license_<?= htmlReady($license['license_id']) ?>">
-                            <? switch ($license['license_id']) {
-                                case "0":
-                                    echo Assets::img("icons/16/blue/checkbox-checked", array('class' => "text-bottom"));
-                                    break;
-                                case "1":
-                                    echo Assets::img("icons/16/blue/checkbox-unchecked", array('class' => "text-bottom"));
-                                    break;
-                                case "3":
-                                    echo "©";
-                                    break;
-                                case "4":
-                                    echo '<img src="'. $plugin->getPluginURL() .'/assets/cc.svg" height="16px" class="text-bottom">';
-                                    break;
-                                case "5":
-                                    echo Assets::img("icons/16/blue/medal", array('class' => "text-bottom"));
-                                    break;
-                                case "6":
-                                    echo Assets::img("icons/16/blue/file-pic", array('class' => "text-bottom"));
-                                    break;
-                                case "7":
-                                    echo Assets::img("icons/16/blue/literature", array('class' => "text-bottom"));
-                                    break;
-                                default:
-                                    echo Assets::img("icons/16/blue/question-circle", array('class' => "text-bottom"));
-                            } ?>
-                            <?= htmlReady($license['name']) ?>
-                        </span>
-                        <? endforeach ?>
-                    </a>
                     <? else : ?>
                         <?= Assets::img("icons/20/black/checkbox-".($file['protected'] ? "un" : "")."checked", array('class' => "unchecked")) ?>
                     <? endif ?>
@@ -121,35 +102,6 @@
 </form>
 
 <style>
-    .filelist .license-chooser > * {
-        display: none;
-    }
-    .filelist .license-chooser.license_0 > .license_0 {
-        display: block;
-    }
-    .filelist .license-chooser.license_1 > .license_1 {
-        display: block;
-    }
-    .filelist .license-chooser.license_2 > .license_2 {
-        display: block;
-    }
-    .filelist .license-chooser.license_3 > .license_3 {
-        display: block;
-    }
-    .filelist .license-chooser.license_4 > .license_4 {
-        display: block;
-    }
-    .filelist .license-chooser.license_5 > .license_5 {
-        display: block;
-    }
-    .filelist .license-chooser.license_6 > .license_6 {
-        display: block;
-    }
-    .filelist .license-chooser.license_7 > .license_7 {
-        display: block;
-    }
-
-
     .filelist th.sortasc {
         padding-left: 20px;
         background-image: url(<?= Assets::image_path("icons/blue/arr_1down.svg") ?>);
@@ -167,25 +119,18 @@
 </style>
 
 <script>
-    STUDIP.MyProtectedFiles = {
-        toggle: function () {
+    STUDIP.Lizenzstatus = {
+        toggle: function (license_id) {
             var dokument_id = jQuery(this).closest("tr").data("dokument_id");
-            var oldlicensestate = jQuery(this).attr("class");
-            oldlicensestate = oldlicensestate.substr(oldlicensestate.indexOf("_") + 1);
-            var newlicensestate = jQuery(this).find(".license_" + oldlicensestate).next().attr("class");
-            if (typeof newlicensestate === "undefined") {
-                newlicensestate = 3;
-            } else {
-                newlicensestate = newlicensestate.substr(newlicensestate.indexOf("_") + 1);
-            }
             jQuery.ajax({
-                "url": STUDIP.ABSOLUTE_URI_STUDIP + "plugins.php/myprotectedfiles/my/toggle/" + dokument_id,
+                "url": STUDIP.ABSOLUTE_URI_STUDIP + "plugins.php/lizenzstatus/my/toggle/" + dokument_id,
                 "data": {
-                    "protected": newlicensestate
+                    "protected": license_id
                 },
                 "type": "post",
-                "success": function () {
-                    jQuery("#doc_" + dokument_id + " .license-chooser").removeClass("license_" + oldlicensestate).addClass("license_" + newlicensestate);
+                "success": function (image_url) {
+                    jQuery("#doc_" + dokument_id + " .action-menu-icon .license").attr("src", image_url);
+                    jQuery("#doc_" + dokument_id + " .action-menu-icon").trigger("click");
                 }
             });
         }

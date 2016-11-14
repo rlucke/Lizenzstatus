@@ -7,7 +7,7 @@
 
         <? foreach ($licenses as $license) : ?>
         <div style="display: flex; align-items: baseline; margin-top: 20px;">
-            <input type="radio" name="license" value="<?= htmlReady($license['license_id']) ?>" id="license_<?= htmlReady($license['license_id']) ?>">
+            <input type="radio" name="license" value="<?= htmlReady($license['license_id']) ?>" id="license_<?= htmlReady($license['license_id']) ?>" required>
             <label for="license_<?= htmlReady($license['license_id']) ?>">
                 <h3 style="margin-top: 0px;"><?= htmlReady($license['name']) ?></h3>
                 <div>

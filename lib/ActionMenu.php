@@ -27,6 +27,8 @@ class ActionMenu
     private $actions = [];
     private $condition_all = null;
     private $condition     = true;
+    public $icon = null;
+    public $title = null;
 
     /**
      * Private constructur.
@@ -92,7 +94,7 @@ class ActionMenu
      * @param array  $attributes Optional attributes to add to the <a> tag
      * @return ActionMenu instance to allow chaining
      */
-    public function addLink($link, $label, Icon $icon = null, array $attributes = [])
+    public function addLink($link, $label, $icon = null, array $attributes = [])
     {
         if ($this->checkCondition()) {
             $this->actions[] = [
@@ -116,7 +118,7 @@ class ActionMenu
      * @param array  $attributes Optional attributes to add to the <a> tag
      * @return ActionMenu instance to allow chaining
      */
-    public function addButton($name, $label, Icon $icon = null, array $attributes = [])
+    public function addButton($name, $label, $icon = null, array $attributes = [])
     {
         if ($this->checkCondition()) {
             $this->actions[] = [
@@ -169,6 +171,8 @@ class ActionMenu
         $tf = new \Flexi_TemplateFactory(__DIR__."/../views/");
         $template = $tf->open($template_file);
         $template->actions = $this->actions;
+        $template->icon = $this->icon;
+        $template->title = $this->title;
         return $template->render();
     }
 

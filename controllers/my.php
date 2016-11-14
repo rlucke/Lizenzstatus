@@ -9,6 +9,24 @@ class MyController extends PluginController {
         parent::before_filter($action, $args);
         Navigation::activateItem("/myprotectedfiles");
         $this->formclass = version_compare($GLOBALS['SOFTWARE_VERSION'], "3.5", ">=") ? "default" : "studip_form";
+
+        $this->icons = array(
+            0 => $this->plugin->getPluginURL() .'/assets/check-circle.svg',
+            1 => $this->plugin->getPluginURL() .'/assets/decline-circle.svg',
+            2 => Assets::image_path("icons/blue/question-circle.svg"),
+            3 => Assets::image_path("icons/blue/person.svg"),
+            4 => $this->plugin->getPluginURL() .'/assets/cc.svg',
+            5 => $this->plugin->getPluginURL() .'/assets/license.svg',
+            6 => $this->plugin->getPluginURL() .'/assets/52a.svg',
+            7 => $this->plugin->getPluginURL() .'/assets/52a-stopp2.svg'
+        );
+
+        Helpbar::Get()->addLink(
+            _("Was bedeuten die Lizenzen?"),
+            PluginEngine::getURL($this->plugin, array(), "my/licensehelp"),
+            Assets::image_path("icons/white/question-circle"),
+            false,
+            array('data-dialog' => 1));
     }
 
     public function files_action()
@@ -29,7 +47,7 @@ class MyController extends PluginController {
             $this->file['protected'] = Request::int("protected", 0);
             $this->file->store();
         }
-        $this->render_nothing();
+        $this->render_text($this->icons[$this->file['protected']]);
     }
 
     public function switchall_action()
@@ -81,6 +99,15 @@ class MyController extends PluginController {
         $this->licenses = $statement->fetchAll(PDO::FETCH_ASSOC);
         $this->files = (array) $_SESSION['SWITCH_FILES'];
         unset($_SESSION['SWITCH_FILES']);
+    }
+
+    public function licensehelp_action()
+    {
+        $statement = DBManager::get()->prepare("
+            SELECT * FROM document_licenses
+        ");
+        $statement->execute();
+        $this->licenses = $statement->fetchAll(PDO::FETCH_ASSOC);
     }
 
 
