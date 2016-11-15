@@ -10,6 +10,7 @@
 
         // Close other menus (and remove contentbox overflow handling)
         if (!menu.is('.active')) {
+            console.log(",hgjhg");
             $('.action-menu').removeClass('active')
                 .parents().removeClass('force-visible-overflow');
         }

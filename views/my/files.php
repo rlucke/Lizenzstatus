@@ -23,7 +23,7 @@
                 <? $access = $file->checkAccess($GLOBALS['user']->id) ?>
                 <td>
                     <? if ($access) : ?>
-                        <input type="checkbox" class="file" name="d[]" value="<?= $file->getId() ?>">
+                        <input type="checkbox" class="file" name="d[]" value="<?= $file->getId() ?>" required>
                     <? endif ?>
                 </td>
                 <td>
@@ -74,16 +74,14 @@
                             $actionmenu = MyProtectedFiles\ActionMenu::get();
                             $actionmenu->icon = $icons[$file['protected']];
                             foreach ($licenses as $license) {
-                                if ($license['license_id'] > 1) {
-                                    $actionmenu->addLink(
-                                        "#",
-                                        $license['name'],
-                                        $icons[$license['license_id']],
-                                        array(
-                                            'onclick' => "STUDIP.Lizenzstatus.toggle.call(this, '" . $license['license_id'] . "'); return false;"
-                                        )
-                                    );
-                                }
+                                $actionmenu->addLink(
+                                    $license['license_id'] > 1 ? "#" : "",
+                                    $license['name'],
+                                    $icons[$license['license_id']],
+                                    array(
+                                        'onclick' => "STUDIP.Lizenzstatus.toggle.call(this, '" . $license['license_id'] . "'); return false;"
+                                    )
+                                );
                                 if ($license['license_id'] == $file['protected']) {
                                     $actionmenu->title = $license['name'];
                                 }
@@ -139,9 +137,9 @@
         jQuery("table.filelist").tablesorter({
             textExtraction: function (node) {
                 var node = jQuery(node);
-                if (node.is("tr > td:last-child")) {
+                /*if (node.is("tr > td:last-child")) {
                     console.log(String(node.data('timestamp') || node.text()).trim());
-                }
+                }*/
                 return String(node.data('timestamp') || node.text()).trim();
             },
             cssAsc: 'sortasc',
@@ -157,14 +155,14 @@ $actions = new ActionsWidget();
 $actions->addLink(
     _("Lizenzen der ausgewählten Dokumente setzen"),
     PluginEngine::getURL($plugin, array(), "my/selectlicense"),
-    Assets::image_path("icons/16/black/remove/checkbox-unchecked"),
+    class_exists("Icon") ? Icon::create("checkbox-unchecked+remove", "info") : Assets::image_path("icons/16/black/remove/checkbox-unchecked"),
     array('onclick' => "jQuery('#action').val('selectlicense'); jQuery('#action_form').attr('data-dialog', '1').submit(); return false;")
 );
 if (Config::get()->ALLOW_MASS_FILE_DELETING) {
     $actions->addLink(
         _("Ausgewählte Dateien löschen."),
         "#",
-        Assets::image_path("icons/16/black/trash"),
+        class_exists("Icon") ? Icon::create("trash", "info") : Assets::image_path("icons/16/black/trash"),
         array('onClick' => "if (typeof STUDIP.Dialog.confirm !== 'undefined') { STUDIP.Dialog.confirm('". _("Wirklich alle ausgewählten Dateien löschen?") ."', function () { jQuery('#action').val('delete'); jQuery('#action_form').removeAttr('data-dialog', '1').submit(); }); } else if (window.confirm('". _("Wirklich alle ausgewählten Dateien löschen?") ."')) { jQuery('#action').val('delete'); jQuery('#action_form').removeAttr('data-dialog', '1').submit(); } return false;")
     );
 }

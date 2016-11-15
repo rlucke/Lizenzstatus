@@ -93,7 +93,7 @@ class MyController extends PluginController {
             $this->redirect("my/files");
         }
         $statement = DBManager::get()->prepare("
-            SELECT * FROM document_licenses WHERE license_id >= 2
+            SELECT * FROM document_licenses WHERE license_id >= 2 ORDER BY license_id ASC
         ");
         $statement->execute();
         $this->licenses = $statement->fetchAll(PDO::FETCH_ASSOC);

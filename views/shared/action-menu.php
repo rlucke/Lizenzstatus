@@ -15,7 +15,11 @@ $attributes = function (array $attributes) {
 <nav class="lizenzstatus-action-menu">
     <div class="action-menu-icon" title="<?= htmlReady($title ?: _('Aktionen')) ?>">
         <img src="<?= htmlReady($icon) ?>" width="20px" height="20px" class="license">
-        <?= Assets::img("icons/20/blue/decline", array('class' => "decline")) ?>
+        <? if (class_exists("Icon")) : ?>
+            <?= Icon::create("decline", "clickable")->asImg("20px", array('class' => "decline")) ?>
+        <? else : ?>
+            <?= Assets::img("icons/20/blue/decline", array('class' => "decline")) ?>
+        <? endif ?>
     </div>
     <div class="action-menu-content">
         <div class="action-menu-title">
@@ -25,14 +29,22 @@ $attributes = function (array $attributes) {
         <? foreach ($actions as $action): ?>
             <li class="action-menu-item">
             <? if ($action['type'] === 'link'): ?>
+                <? if ($action['link']) : ?>
                 <a href="<?= $action['link'] ?>" <?= $attributes($action['attributes']) ?>>
+                <? else : ?>
+                    <div style="opacity: 0.5">
+                <? endif ?>
                 <? if ($action['icon']): ?>
                     <img src="<?= htmlReady($action['icon']) ?>" height="20px">
                 <? else: ?>
                     <span class="action-menu-no-icon"></span>
                 <? endif; ?>
                     <?= htmlReady($action['label']) ?>
+                <? if ($action['link']) : ?>
                 </a>
+                <? else : ?>
+                </div>
+                <? endif ?>
             <? elseif ($action['type'] === 'button'): ?>
                 <label>
                 <? if ($action['icon']): ?>
