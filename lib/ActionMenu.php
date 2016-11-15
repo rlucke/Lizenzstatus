@@ -24,7 +24,7 @@ class ActionMenu
         return new self();
     }
 
-    private $actions = [];
+    private $actions = array();
     private $condition_all = null;
     private $condition     = true;
     public $icon = null;
@@ -94,16 +94,16 @@ class ActionMenu
      * @param array  $attributes Optional attributes to add to the <a> tag
      * @return ActionMenu instance to allow chaining
      */
-    public function addLink($link, $label, $icon = null, array $attributes = [])
+    public function addLink($link, $label, $icon = null, array $attributes = array())
     {
         if ($this->checkCondition()) {
-            $this->actions[] = [
+            $this->actions[] = array(
                 'type'       => 'link',
                 'link'       => $link,
                 'icon'       => $icon,
                 'label'      => $label,
                 'attributes' => $attributes,
-            ];
+            );
         }
 
         return $this;
@@ -118,16 +118,16 @@ class ActionMenu
      * @param array  $attributes Optional attributes to add to the <a> tag
      * @return ActionMenu instance to allow chaining
      */
-    public function addButton($name, $label, $icon = null, array $attributes = [])
+    public function addButton($name, $label, $icon = null, array $attributes = array())
     {
         if ($this->checkCondition()) {
-            $this->actions[] = [
+            $this->actions[] = array(
                 'type'       => 'button',
                 'name'       => $name,
                 'icon'       => $icon,
                 'label'      => $label,
                 'attributes' => $attributes,
-            ];
+            );
         }
 
         return $this;
@@ -142,10 +142,10 @@ class ActionMenu
     public function addMultiPersonSearch(MultiPersonSearch $mp)
     {
         if ($this->checkCondition()) {
-            $this->actions[] = [
+            $this->actions[] = array(
                 'type'   => 'multi-person-search',
                 'object' => $mp,
-            ];
+            );
         }
 
         return $this;

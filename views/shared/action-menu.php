@@ -1,7 +1,7 @@
 
 <?php
 $attributes = function (array $attributes) {
-    $result = [];
+    $result = array();
     foreach ($attributes as $key => $value) {
         if ($value === null) {
             $result[] = htmlReady($key);
@@ -48,7 +48,7 @@ $attributes = function (array $attributes) {
             <? elseif ($action['type'] === 'button'): ?>
                 <label>
                 <? if ($action['icon']): ?>
-                    <?= $action['icon']->asInput(['name' => $action['name']]) ?>
+                    <?= $action['icon']->asInput(array('name' => $action['name'])) ?>
                 <? else: ?>
                     <span class="action-menu-no-icon"></span>
                     <button type="submit" name="<?= htmlReady($action['name']) ?>" style="display: none;"></button>

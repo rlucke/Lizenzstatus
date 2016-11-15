@@ -1,6 +1,6 @@
 <?php
 $attributes = function (array $attributes) {
-    $result = [];
+    $result = array();
     foreach ($attributes as $key => $value) {
         if ($value === null) {
             $result[] = htmlReady($key);
@@ -14,7 +14,7 @@ $attributes = function (array $attributes) {
 
 <? foreach ($actions as $action): ?>
     <? if ($action['type'] === 'link'): ?>
-        <a href="<?= $action['link'] ?>" <?= $attributes($action['attributes'] + ['title' => $action['label']]) ?>>
+        <a href="<?= $action['link'] ?>" <?= $attributes($action['attributes'] + array('title' => $action['label'])) ?>>
         <? if ($action['icon']): ?>
             <?= $action['icon'] ?>
         <? else: ?>
@@ -24,7 +24,7 @@ $attributes = function (array $attributes) {
     <? elseif ($action['type'] === 'button'): ?>
         <label>
         <? if ($action['icon']): ?>
-            <?= $action['icon']->asInput(['name' => $action['name']]) ?>
+            <?= $action['icon']->asInput(array('name' => $action['name'])) ?>
         <? else: ?>
             <span class="action-menu-no-icon"></span>
             <button type="submit" name="<?= htmlReady($action['name']) ?>" style="display: none;"></button>
