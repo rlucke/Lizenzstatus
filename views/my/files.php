@@ -155,7 +155,9 @@ $actions = new ActionsWidget();
 $actions->addLink(
     _("Lizenzen der ausgewählten Dokumente setzen"),
     PluginEngine::getURL($plugin, array(), "my/selectlicense"),
-    $plugin->getPluginURL()."/assets/license.svg",
+    version_compare($GLOBALS['SOFTWARE_VERSION'], "3.3", ">=")
+        ? Icon::create($plugin->getPluginURL()."/assets/license.svg")
+        : $plugin->getPluginURL()."/assets/license.svg",
     array('onclick' => "jQuery('#action').val('selectlicense'); jQuery('#action_form').attr('data-dialog', '1').submit(); return false;")
 );
 if (Config::get()->ALLOW_MASS_FILE_DELETING) {
