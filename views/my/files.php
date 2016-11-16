@@ -170,5 +170,17 @@ if (Config::get()->ALLOW_MASS_FILE_DELETING) {
         array('onClick' => "if (typeof STUDIP.Dialog.confirm !== 'undefined') { STUDIP.Dialog.confirm('". _("Wirklich alle ausgewählten Dateien löschen?") ."', function () { jQuery('#action').val('delete'); jQuery('#action_form').removeAttr('data-dialog', '1').submit(); }); } else if (window.confirm('". _("Wirklich alle ausgewählten Dateien löschen?") ."')) { jQuery('#action').val('delete'); jQuery('#action_form').removeAttr('data-dialog', '1').submit(); } return false;")
     );
 }
-
 Sidebar::Get()->addWidget($actions);
+
+$semester_select = new SelectWidget(
+    _("Nach Semester filtern"),
+    PluginEngine::getLink($plugin, array(), "my/files"),
+    "semester_id"
+);
+$semesters = Semester::getAll();
+$semesterdata = array("" => _("Alle"));
+foreach ($semesters as $semester) {
+    $semesterdata[$semester->getId()] = $semester['name'];
+}
+$semester_select->setOptions($semesterdata);
+Sidebar::Get()->addWidget($semester_select);

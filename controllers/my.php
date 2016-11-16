@@ -32,7 +32,32 @@ class MyController extends PluginController {
     public function files_action()
     {
         PageLayout::addScript($this->plugin->getPluginURL()."/assets/jquery.tablesorter-2.22.5.js");
-        $this->files = StudipDocument::findBySQL("user_id = ? ORDER BY mkdate DESC", array($GLOBALS['user']->id));
+        if (Request::option("semester_id")) {
+            $semester = Semester::find(Request::option("semester_id"));
+            $statement = DBManager::get()->prepare("
+                SELECT dokumente.*
+                FROM dokumente
+                    INNER JOIN seminare ON (dokumente.seminar_id = seminare.Seminar_id)
+                WHERE user_id = :user_id 
+                    AND (
+                        seminare.start_time = :beginn
+                        OR (seminare.start_time < :beginn AND seminare.duration_time = -1)
+                        OR (seminare.start_time < :beginn AND seminare.start_time + seminare.duration_time >= :beginn)
+                    )
+                ORDER BY mkdate DESC
+            ");
+            $statement->execute(array(
+                'user_id' => $GLOBALS['user']->id,
+                'beginn' => $semester['beginn']
+            ));
+            $documents_data = $statement->fetchAll(PDO::FETCH_ASSOC);
+            $this->files = array();
+            foreach ($documents_data as $data) {
+                $this->files[] = StudipDocument::buildExisting($data);
+            }
+        } else {
+            $this->files = StudipDocument::findBySQL("user_id = ? ORDER BY mkdate DESC", array($GLOBALS['user']->id));
+        }
         $statement = DBManager::get()->prepare("
             SELECT * FROM document_licenses ORDER BY license_id <> 2 DESC, license_id ASC
         ");
