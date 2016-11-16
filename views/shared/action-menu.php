@@ -15,7 +15,7 @@ $attributes = function (array $attributes) {
 <nav class="lizenzstatus-action-menu">
     <div class="action-menu-icon" title="<?= htmlReady($title ?: _('Aktionen')) ?>">
         <img src="<?= htmlReady($icon) ?>" width="20px" height="20px" class="license">
-        <? if (version_compare($GLOBALS['SOFTWARE_VERSION'], "3.3", ">=")) : ?>
+        <? if (version_compare($GLOBALS['SOFTWARE_VERSION'], "3.4", ">=")) : ?>
             <?= Icon::create("decline", "clickable")->asImg("20px", array('class' => "decline"))  ?>
         <? else : ?>
             <?= Assets::img("icons/20/blue/decline", array('class' => "decline")) ?>

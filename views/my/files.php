@@ -155,7 +155,7 @@ $actions = new ActionsWidget();
 $actions->addLink(
     _("Lizenzen der ausgewählten Dokumente setzen"),
     PluginEngine::getURL($plugin, array(), "my/selectlicense"),
-    version_compare($GLOBALS['SOFTWARE_VERSION'], "3.3", ">=")
+    version_compare($GLOBALS['SOFTWARE_VERSION'], "3.4", ">=")
         ? Icon::create($plugin->getPluginURL()."/assets/license.svg")
         : $plugin->getPluginURL()."/assets/license.svg",
     array('onclick' => "jQuery('#action').val('selectlicense'); jQuery('#action_form').attr('data-dialog', '1').submit(); return false;")
@@ -164,7 +164,7 @@ if (Config::get()->ALLOW_MASS_FILE_DELETING) {
     $actions->addLink(
         _("Ausgewählte Dateien löschen."),
         "#",
-        version_compare($GLOBALS['SOFTWARE_VERSION'], "3.3", ">=")
+        version_compare($GLOBALS['SOFTWARE_VERSION'], "3.4", ">=")
             ? Icon::create("trash", "info")
             : Assets::image_path("icons/16/black/trash"),
         array('onClick' => "if (typeof STUDIP.Dialog.confirm !== 'undefined') { STUDIP.Dialog.confirm('". _("Wirklich alle ausgewählten Dateien löschen?") ."', function () { jQuery('#action').val('delete'); jQuery('#action_form').removeAttr('data-dialog', '1').submit(); }); } else if (window.confirm('". _("Wirklich alle ausgewählten Dateien löschen?") ."')) { jQuery('#action').val('delete'); jQuery('#action_form').removeAttr('data-dialog', '1').submit(); } return false;")

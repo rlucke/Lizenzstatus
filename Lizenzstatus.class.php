@@ -7,7 +7,7 @@ class Lizenzstatus extends StudIPPlugin implements SystemPlugin {
     public function __construct() {
         parent::__construct();
         $nav = new Navigation(_("Lizenzstatus"));
-        $nav->setImage(version_compare($GLOBALS['SOFTWARE_VERSION'], "3.3", ">=")
+        $nav->setImage(version_compare($GLOBALS['SOFTWARE_VERSION'], "3.4", ">=")
             ? Icon::create("files", "navigation")
             : Assets::image_path("icons/lightblue/files.svg")
         );
