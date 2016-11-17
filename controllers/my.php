@@ -75,17 +75,6 @@ class MyController extends PluginController {
         $this->render_text($this->icons[$this->file['protected']]);
     }
 
-    public function switchall_action()
-    {
-        $this->files = StudipDocument::findBySQL("user_id = ? ORDER BY mkdate DESC", array($GLOBALS['user']->id));
-        foreach ($this->files as $file) {
-            $file['protected'] = 1;
-            $file->store();
-        }
-        PageLayout::postMessage(MessageBox::success(_("Alle Ihre Dokumente sind markiert als: „Nicht frei von Rechten Dritter“ <br><b>Achtung</b>: Damit Studierende diese Dokumente herunterladen können, müssen die betreffenden Veranstaltungen gesperrt werden.")));
-        $this->redirect("my/files");
-    }
-
     public function command_action() {
         if (Request::isPost()) {
             if (Request::get("action") === "delete") {
@@ -96,10 +85,10 @@ class MyController extends PluginController {
                     }
                 }
                 PageLayout::postMessage(MessageBox::success(_("Ausgewählte Dateien wurden gelöscht.")));
-                $this->redirect("my/files");
+                $this->redirect("my/files".(Request::option("semester_id") ? "?semester_id=".Request::option("semester_id"): ""));
             } elseif (Request::get("action") === "selectlicense") {
                 $_SESSION['SWITCH_FILES'] = Request::getArray("d");
-                $this->redirect("my/selectlicense");
+                $this->redirect("my/selectlicense".(Request::option("semester_id") ? "?semester_id=".Request::option("semester_id"): ""));
             }
         }
     }
@@ -115,7 +104,7 @@ class MyController extends PluginController {
                 }
             }
             PageLayout::postMessage(MessageBox::success(sprintf(_("%s Dokumente verändert."), count(Request::getArray("d")))));
-            $this->redirect("my/files");
+            $this->redirect("my/files".(Request::option("semester_id") ? "?semester_id=".Request::option("semester_id"): ""));
         }
         $statement = DBManager::get()->prepare("
             SELECT * FROM document_licenses WHERE license_id >= 2 ORDER BY license_id ASC

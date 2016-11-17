@@ -1,5 +1,6 @@
 <form action="<?= PluginEngine::getLink($plugin, array(), "my/command") ?>" method="post" id="action_form" data-dialog class="<?= $formclass ?>">
     <input type="hidden" id="action" name="action" value="selectlicense">
+    <input type="hidden" name="semester_id" value="<?= htmlReady(Request::option("semester_id")) ?>">
 
     <table class="default filelist">
         <caption>
@@ -177,7 +178,7 @@ $semester_select = new SelectWidget(
     PluginEngine::getLink($plugin, array(), "my/files"),
     "semester_id"
 );
-$semesters = Semester::getAll();
+$semesters = array_reverse(Semester::getAll());
 $semesterdata = array("" => _("Alle"));
 foreach ($semesters as $semester) {
     $semesterdata[$semester->getId()] = $semester['name'];
