@@ -13,8 +13,8 @@ class MyController extends PluginController {
         $this->icons = array(
             0 => $this->plugin->getPluginURL() .'/assets/check-circle.svg',
             1 => $this->plugin->getPluginURL() .'/assets/decline-circle.svg',
-            2 => Assets::image_path("icons/blue/question-circle.svg"),
-            3 => Assets::image_path("icons/blue/person.svg"),
+            2 => $this->plugin->getPluginURL() .'/assets/question-circle.svg',
+            3 => $this->plugin->getPluginURL() .'/assets/own-license.svg',
             4 => $this->plugin->getPluginURL() .'/assets/cc.svg',
             5 => $this->plugin->getPluginURL() .'/assets/license.svg',
             6 => $this->plugin->getPluginURL() .'/assets/52a.svg',
