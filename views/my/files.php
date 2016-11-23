@@ -173,15 +173,18 @@ if (Config::get()->ALLOW_MASS_FILE_DELETING) {
 }
 Sidebar::Get()->addWidget($actions);
 
-/**$semester_select = new SelectWidget(
+$semester_select = new SelectWidget(
     _("Nach Semester filtern"),
     PluginEngine::getLink($plugin, array(), "my/files"),
     "semester_id"
 );
 $semesters = array_reverse(Semester::getAll());
-$semesterdata = array("" => _("Alle"));
+$select_element = new SelectElement("", _("Alle"), false);
 foreach ($semesters as $semester) {
-    $semesterdata[$semester->getId()] = $semester['name'];
+    $semester_select->addElement(new SelectElement(
+        $semester->getId(),
+        $semester['name'],
+        Request::get("semester_id") === $semester->getId()
+    ));
 }
-$semester_select->setOptions($semesterdata);
-Sidebar::Get()->addWidget($semester_select);*/
+Sidebar::Get()->addWidget($semester_select);
