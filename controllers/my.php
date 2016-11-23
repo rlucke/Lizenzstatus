@@ -44,6 +44,7 @@ class MyController extends PluginController {
                         OR (seminare.start_time < :beginn AND seminare.duration_time = -1)
                         OR (seminare.start_time < :beginn AND seminare.start_time + seminare.duration_time >= :beginn)
                     )
+                    AND dokumente.url = ''
                 ORDER BY mkdate DESC
             ");
             $statement->execute(array(
@@ -56,7 +57,10 @@ class MyController extends PluginController {
                 $this->files[] = StudipDocument::buildExisting($data);
             }
         } else {
-            $this->files = StudipDocument::findBySQL("user_id = ? ORDER BY mkdate DESC", array($GLOBALS['user']->id));
+            $this->files = StudipDocument::findBySQL("
+                user_id = ? 
+                AND dokumente.url = ''
+                ORDER BY mkdate DESC", array($GLOBALS['user']->id));
         }
         $statement = DBManager::get()->prepare("
             SELECT * FROM document_licenses ORDER BY license_id <> 2 DESC, license_id ASC
