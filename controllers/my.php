@@ -38,7 +38,7 @@ class MyController extends PluginController {
                 SELECT dokumente.*
                 FROM dokumente
                     INNER JOIN seminare ON (dokumente.seminar_id = seminare.Seminar_id)
-                WHERE user_id = :user_id 
+                WHERE user_id = :user_id
                     AND (
                         seminare.start_time = :beginn
                         OR (seminare.start_time < :beginn AND seminare.duration_time = -1)
@@ -57,10 +57,16 @@ class MyController extends PluginController {
                 $this->files[] = StudipDocument::buildExisting($data);
             }
         } else {
-            $this->files = StudipDocument::findBySQL("
-                user_id = ? 
+            $this->files = DBManager::get()->fetchAll("
+                SELECT dokumente.*
+                FROM dokumente INNER JOIN (
+                    SELECT seminar_id as id FROM seminare
+                    UNION
+                    SELECT institut_id as id FROM Institute
+                ) bla ON bla.id = dokumente.seminar_id
+                WHERE user_id = ?
                 AND dokumente.url = ''
-                ORDER BY mkdate DESC", array($GLOBALS['user']->id));
+                ORDER BY mkdate DESC", array($GLOBALS['user']->id), 'StudipDocument::buildExisting');
         }
         $statement = DBManager::get()->prepare("
             SELECT * FROM document_licenses ORDER BY license_id <> 2 DESC, license_id ASC
