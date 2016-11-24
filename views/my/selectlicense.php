@@ -8,17 +8,21 @@
 
         <? foreach ($licenses as $license) : ?>
         <div style="display: flex; align-items: baseline; margin-top: 20px;">
+        <div>
             <input type="radio" name="license" value="<?= htmlReady($license['license_id']) ?>" id="license_<?= htmlReady($license['license_id']) ?>" required>
+            </div>
+            <div>
             <label for="license_<?= htmlReady($license['license_id']) ?>">
                 <h3 style="margin-top: 0px;"><?= htmlReady($license['name']) ?></h3>
                 <div>
                     <?= formatReady($license['description']) ?>
                 </div>
             </label>
+            </div>
         </div>
         <? endforeach ?>
     </fieldset>
     <div data-dialog-button>
-        <?= \Studip\Button::create(_("Speichern")) ?>
+        <?= \Studip\Button::create(_("Speichern"), 'store') ?>
     </div>
 </form>
