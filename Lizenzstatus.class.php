@@ -1,6 +1,7 @@
 <?php
 
 require_once __DIR__."/lib/ActionMenu.php";
+require_once __DIR__."/controllers/my.php";
 
 class Lizenzstatus extends StudIPPlugin implements SystemPlugin {
 
@@ -39,4 +40,6 @@ class Lizenzstatus extends StudIPPlugin implements SystemPlugin {
             $_SESSION['HAS_SEEN_52A_INFO'] = true;
         }
     }
+    
+    
 }

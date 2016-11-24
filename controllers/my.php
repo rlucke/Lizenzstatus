@@ -1,6 +1,22 @@
 <?php
 
-require_once 'app/controllers/plugin_controller.php';
+require_once __DIR__.'/../Lizenzstatus.class.php';
+
+//for Stud.IP 2.5 compatibility:
+if(!class_exists(Trails_Controller)) {
+    require_once 'vendor/trails/src/controller.php';
+}
+
+//depending if it's Stud.IP 2.5 or something newer we have
+//to include different classes to get the PluginController class.
+if (version_compare($GLOBALS['SOFTWARE_VERSION'], "3.0", ">=")) {
+    require_once 'app/controllers/plugin_controller.php';
+} else {
+    require_once __DIR__.'/../lib/PluginController25.class.php';
+}
+
+
+
 
 class MyController extends PluginController {
 
@@ -29,6 +45,12 @@ class MyController extends PluginController {
             array('data-dialog' => 1));
     }
 
+    public function my_action()
+    {
+    
+    }
+    
+    
     public function files_action()
     {
         PageLayout::addScript($this->plugin->getPluginURL()."/assets/jquery.tablesorter-2.22.5.js");
