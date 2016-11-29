@@ -139,10 +139,22 @@ class MyController extends PluginController {
                     }
                 }
                 PageLayout::postMessage(MessageBox::success(_("Ausgewählte Dateien wurden gelöscht.")));
-                $this->redirect("my/files".(Request::option("semester_id") ? "?semester_id=".Request::option("semester_id"): ""));
+                $this->redirect(
+                    PluginEngine::getUrl(
+                        $this->plugin,
+                        array('semester_id' => Request::option("semester_id")),
+                        'my/files'
+                    )
+                );
             } elseif (Request::get("action") === "selectlicense") {
                 $_SESSION['SWITCH_FILES'] = Request::getArray("d");
-                $this->redirect("my/selectlicense".(Request::option("semester_id") ? "?semester_id=".Request::option("semester_id"): ""));
+                $this->redirect(
+                    PluginEngine::getUrl(
+                        $this->plugin,
+                        array('semester_id' => Request::option("semester_id")),
+                        'my/selectlicense'
+                    )
+                );
             }
         }
     }
@@ -158,7 +170,21 @@ class MyController extends PluginController {
                 }
             }
             PageLayout::postMessage(MessageBox::success(sprintf(_("%s Dokumente verändert."), count(Request::getArray("d")))));
-            $this->redirect("my/files".(Request::option("semester_id") ? "?semester_id=".Request::option("semester_id"): ""));
+            if(Request::option('semester_id')) {
+                $this->redirect(PluginEngine::getUrl(
+                    $this->plugin,
+                    array(
+                        'semester_id' => Request::option('semester_id')
+                    ),
+                    'my/files'
+                ));
+            } else {
+                $this->redirect(PluginEngine::getUrl(
+                    $this->plugin,
+                    array(),
+                    'my/files'
+                ));
+            }
         }
         $statement = DBManager::get()->prepare("
             SELECT * FROM document_licenses WHERE license_id >= 2 ORDER BY license_id ASC

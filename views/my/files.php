@@ -202,8 +202,8 @@ if(version_compare($GLOBALS['SOFTWARE_VERSION'], '3.1', '>=')) {
 } else {
     //code for Stud.IP 2.5 and 3.0:
     
-    $action_links = '<a href="' . PluginEngine::getURL($plugin, array(), "my/selectlicense") . '" '
-        
+    $action_links = '<a href="' . PluginEngine::getLink($plugin, array(), "my/selectlicense") . '" '
+        . "onclick=\"jQuery('#action').val('selectlicense'); jQuery('#action_form').attr('data-dialog', '1').submit(); return false;\" "
         . '>' . Assets::img($plugin->getPluginURL().'/assets/license.svg',
                 array('size' => '16', 'class' => 'text-bottom')
             )
@@ -220,7 +220,7 @@ if(version_compare($GLOBALS['SOFTWARE_VERSION'], '3.1', '>=')) {
     $semesters = array_reverse(Semester::getAll());
     
     $semester_select = '<form novalidate="novalidate" action="'
-        . PluginEngine::getURL($plugin, array(), '/my/files')
+        . PluginEngine::getLink($plugin, array(), 'my/files')
         . '" method="get"><select name="semester_id" onchange="$(this).closest(\'form\').submit();">';
         
     $semester_select .= '<option value="" '
