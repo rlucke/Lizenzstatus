@@ -179,7 +179,7 @@ $semester_select = new SelectWidget(
     "semester_id"
 );
 $semesters = array_reverse(Semester::getAll());
-$select_element = new SelectElement("", _("Alle"), false);
+$semester_select->addElement(new SelectElement("", _("Alle"), false));
 foreach ($semesters as $semester) {
     $semester_select->addElement(new SelectElement(
         $semester->getId(),
