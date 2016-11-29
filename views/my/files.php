@@ -210,10 +210,10 @@ if(version_compare($GLOBALS['SOFTWARE_VERSION'], '3.1', '>=')) {
         . _('Lizenzen der ausgewählten Dokumente setzen') . '</a><br>';
     
     if(Config::get()->ALLOW_MASS_FILE_DELETING) {
-        $action_links .= '<a href="#" onclick="' . "if (typeof STUDIP.Dialog.confirm !== 'undefined') { STUDIP.Dialog.confirm('". _("Wirklich alle ausgewählten Dateien löschen?") ."', function () { jQuery('#action').val('delete'); jQuery('#action_form').removeAttr('data-dialog', '1').submit(); }); } else if (window.confirm('". _("Wirklich alle ausgewählten Dateien löschen?") ."')) { jQuery('#action').val('delete'); jQuery('#action_form').removeAttr('data-dialog', '1').submit(); } return false;" . '" '
-        . '>' . Assets::img('icons/16/black/trash', array('size' => '16'))
-        . _('Ausgewählte Dateien löschen') . '</a><br>';
-        
+        $action_links .= '<a href="#" onclick="'
+                . "if (window.confirm('". _("Wirklich alle ausgewählten Dateien löschen?") ."')) { jQuery('#action').val('delete'); jQuery('#action_form').removeAttr('data-dialog', '1').submit(); } return false;"
+            . '" >' . Assets::img('icons/16/black/trash', array('size' => '16'))
+            . _('Ausgewählte Dateien löschen') . '</a><br>';
     }
     
     
