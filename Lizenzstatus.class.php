@@ -22,13 +22,14 @@ class Lizenzstatus extends StudIPPlugin implements SystemPlugin {
                 Icon::create("files", "navigation")
             );
         } else {
-            $nav->setImage(
-                $this->getPluginURL()."/assets/files_lightblue.svg"
-            );
             if(version_compare($GLOBALS['SOFTWARE_VERSION'], '3.0', '>=')) {
-                //for Stud.IP 2.5:
-                $nav->setActiveImage(
-                    Assets::img('icons/32/white/files.png')
+                $nav->setImage(
+                    $this->getPluginURL()."/assets/files_lightblue.svg"
+                );
+            } else {
+                //special icon for Stud.IP 2.5:
+                $nav->setImage(
+                    $this->getPluginURL()."/assets/files_25.svg"
                 );
             }
         }
