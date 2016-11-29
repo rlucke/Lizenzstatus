@@ -20,8 +20,9 @@
         </thead>
         <tbody>
         <? foreach ($files as $file) : ?>
+            <? $access = $file->checkAccess($GLOBALS['user']->id) ?>
+            <? if (!$access) continue; ?>
             <tr id="doc_<?= htmlReady($file->getId()) ?>" data-dokument_id="<?= htmlReady($file->getId()) ?>">
-                <? $access = $file->checkAccess($GLOBALS['user']->id) ?>
                 <td>
                     <? if ($access) : ?>
                         <input type="checkbox" class="file" name="d[]" value="<?= $file->getId() ?>">
@@ -52,20 +53,24 @@
                         ),
                         'open' => $file->getId()
                     )) ?>">
-                        <?= htmlReady($file->course->name) ?>
+                        <?= htmlReady($file->course ? $file->course->name : $file->institute->name) ?>
                     </a>
                 </td>
-                <td data-timestamp="<?= htmlReady($file->course->start_semester->beginn) ?>">
-                    <?= htmlReady($file->course->start_semester->name) ?>
-                    <? if ($file->course['duration_time'] != 0) : ?>
-                        -
-                        <? if ($file->course['duration_time'] == -1) : ?>
-                            <?= _("unbegrenzt") ?>
-                        <? else : ?>
-                            <?= htmlReady($file->course->end_semester->name) ?>
+                <? if ($file->course) : ?>
+                    <td data-timestamp="<?= htmlReady($file->course->start_semester->beginn) ?>">
+                        <?= htmlReady($file->course->start_semester->name) ?>
+                        <? if ($file->course['duration_time'] != 0) : ?>
+                            -
+                            <? if ($file->course['duration_time'] == -1) : ?>
+                                <?= _("unbegrenzt") ?>
+                            <? else : ?>
+                                <?= htmlReady($file->course->end_semester->name) ?>
+                            <? endif ?>
                         <? endif ?>
-                    <? endif ?>
-                </td>
+                    </td>
+                <? else : ?>
+                    <td data-timestamp="0">-</td>
+                <? endif ?>
                 <td data-timestamp="<?= htmlReady($file['mkdate']) ?>">
                     <?= date("d.m.Y H:i", $file['mkdate'])." "._("Uhr") ?>
                 </td>
