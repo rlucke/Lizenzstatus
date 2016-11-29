@@ -10,7 +10,9 @@
 
 //this code was taken from Stud.IP 3.3
 
-require_once 'app/controllers/studip_controller.php';
+if(!class_exists(StudipController)) {
+    require_once 'app/controllers/studip_controller.php';
+}
 
 class PluginController extends StudipController {
 

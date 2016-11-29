@@ -53,18 +53,20 @@
                         ),
                         'open' => $file->getId()
                     )) ?>">
-                        <?= htmlReady($file->course ? $file->course->name : $file->institute->name) ?>
+                    <? $course = Course::find($file->seminar_id); ?>
+                    
+                        <?= htmlReady($course ? $course->name : $file->institute->name) ?>
                     </a>
                 </td>
-                <? if ($file->course) : ?>
-                    <td data-timestamp="<?= htmlReady($file->course->start_semester->beginn) ?>">
-                        <?= htmlReady($file->course->start_semester->name) ?>
-                        <? if ($file->course['duration_time'] != 0) : ?>
+                <? if ($course) : ?>
+                    <td data-timestamp="<?= htmlReady($course->start_semester->beginn) ?>">
+                        <?= htmlReady($course->start_semester->name) ?>
+                        <? if ($course['duration_time'] != 0) : ?>
                             -
-                            <? if ($file->course['duration_time'] == -1) : ?>
+                            <? if ($course['duration_time'] == -1) : ?>
                                 <?= _("unbegrenzt") ?>
                             <? else : ?>
-                                <?= htmlReady($file->course->end_semester->name) ?>
+                                <?= htmlReady($course->end_semester->name) ?>
                             <? endif ?>
                         <? endif ?>
                     </td>
@@ -157,39 +159,107 @@
 
 
 <?
-$actions = new ActionsWidget();
-$actions->addLink(
-    _("Lizenzen der ausgewählten Dokumente setzen"),
-    PluginEngine::getURL($plugin, array(), "my/selectlicense"),
-    version_compare($GLOBALS['SOFTWARE_VERSION'], "3.4", ">=")
-        ? Icon::create($plugin->getPluginURL()."/assets/license.svg")
-        : $plugin->getPluginURL()."/assets/license.svg",
-    array('onclick' => "jQuery('#action').val('selectlicense'); jQuery('#action_form').attr('data-dialog', '1').submit(); return false;")
-);
-if (Config::get()->ALLOW_MASS_FILE_DELETING) {
+//the sidebar is available since Stud.IP 3.1. For older versions we must build
+//an infobox instead.
+if(version_compare($GLOBALS['SOFTWARE_VERSION'], '3.1', '>=')) {
+    //code for Stud.IP 3.1 to 3.5:
+    $actions = new ActionsWidget();
     $actions->addLink(
-        _("Ausgewählte Dateien löschen."),
-        "#",
+        _("Lizenzen der ausgewählten Dokumente setzen"),
+        PluginEngine::getURL($plugin, array(), "my/selectlicense"),
         version_compare($GLOBALS['SOFTWARE_VERSION'], "3.4", ">=")
-            ? Icon::create("trash", "info")
-            : Assets::image_path("icons/16/black/trash"),
-        array('onClick' => "if (typeof STUDIP.Dialog.confirm !== 'undefined') { STUDIP.Dialog.confirm('". _("Wirklich alle ausgewählten Dateien löschen?") ."', function () { jQuery('#action').val('delete'); jQuery('#action_form').removeAttr('data-dialog', '1').submit(); }); } else if (window.confirm('". _("Wirklich alle ausgewählten Dateien löschen?") ."')) { jQuery('#action').val('delete'); jQuery('#action_form').removeAttr('data-dialog', '1').submit(); } return false;")
+            ? Icon::create($plugin->getPluginURL()."/assets/license.svg")
+            : $plugin->getPluginURL()."/assets/license.svg",
+        array('onclick' => "jQuery('#action').val('selectlicense'); jQuery('#action_form').attr('data-dialog', '1').submit(); return false;")
+    );
+    if (Config::get()->ALLOW_MASS_FILE_DELETING) {
+        $actions->addLink(
+            _("Ausgewählte Dateien löschen."),
+            "#",
+            version_compare($GLOBALS['SOFTWARE_VERSION'], "3.4", ">=")
+                ? Icon::create("trash", "info")
+                : Assets::image_path("icons/16/black/trash"),
+            array('onClick' => "if (typeof STUDIP.Dialog.confirm !== 'undefined') { STUDIP.Dialog.confirm('". _("Wirklich alle ausgewählten Dateien löschen?") ."', function () { jQuery('#action').val('delete'); jQuery('#action_form').removeAttr('data-dialog', '1').submit(); }); } else if (window.confirm('". _("Wirklich alle ausgewählten Dateien löschen?") ."')) { jQuery('#action').val('delete'); jQuery('#action_form').removeAttr('data-dialog', '1').submit(); } return false;")
+        );
+    }
+    Sidebar::Get()->addWidget($actions);
+
+    $semester_select = new SelectWidget(
+        _("Nach Semester filtern"),
+        PluginEngine::getLink($plugin, array(), "my/files"),
+        "semester_id"
+    );
+    $semesters = array_reverse(Semester::getAll());
+    $semester_select->addElement(new SelectElement("", _("Alle"), false));
+    foreach ($semesters as $semester) {
+        $semester_select->addElement(new SelectElement(
+            $semester->getId(),
+            $semester['name'],
+            Request::get("semester_id") === $semester->getId()
+        ));
+    }
+    Sidebar::Get()->addWidget($semester_select);
+} else {
+    //code for Stud.IP 2.5 and 3.0:
+    
+    $action_links = '<a href="' . PluginEngine::getURL($plugin, array(), "my/selectlicense") . '" '
+        
+        . '>' . Assets::img($plugin->getPluginURL().'/assets/license.svg',
+                array('size' => '16', 'class' => 'text-bottom')
+            )
+        . _('Lizenzen der ausgewählten Dokumente setzen') . '</a><br>';
+    
+    if(Config::get()->ALLOW_MASS_FILE_DELETING) {
+        $action_links .= '<a href="#" onclick="' . "if (typeof STUDIP.Dialog.confirm !== 'undefined') { STUDIP.Dialog.confirm('". _("Wirklich alle ausgewählten Dateien löschen?") ."', function () { jQuery('#action').val('delete'); jQuery('#action_form').removeAttr('data-dialog', '1').submit(); }); } else if (window.confirm('". _("Wirklich alle ausgewählten Dateien löschen?") ."')) { jQuery('#action').val('delete'); jQuery('#action_form').removeAttr('data-dialog', '1').submit(); } return false;" . '" '
+        . '>' . Assets::img('icons/16/black/trash', array('size' => '16'))
+        . _('Ausgewählte Dateien löschen') . '</a><br>';
+        
+    }
+    
+    
+    $semesters = array_reverse(Semester::getAll());
+    
+    $semester_select = '<form novalidate="novalidate" action="'
+        . PluginEngine::getURL($plugin, array(), '/my/files')
+        . '" method="get"><select name="semester_id" onchange="$(this).closest(\'form\').submit();">';
+        
+    $semester_select .= '<option id="" '
+            . (!Request::get('semester_id') ? 'selected="selected"' : '' )
+            . '>' . _('Alle') . '</option>';
+    
+    foreach($semesters as $semester) {
+        $semester_select .= '<option value="'. $semester['id'] .'"'
+            . ((Request::get('semester_id') === $semester['id']) ? 'selected="selected"' : '' )
+            . '>' . $semester['name'] . '</option>';
+    }
+    
+    $semester_select .= '</select><br><noscript>
+        <button type="submit" class="button" name="Zuweisen">' . _('Zuweisen')
+        . '</button></noscript></form>';
+    
+    
+    $infobox = array(
+        'picture' => '',
+        'content' => array(
+            array(
+                'kategorie' => _('Aktionen:'),
+                'eintrag' => array(
+                    array(
+                        'icon' => 'icons/16/black/info.png',
+                        'text' => $action_links
+                    )
+                )
+            ),
+            
+            array(
+                'kategorie' => _('Nach Semester filtern:'),
+                'eintrag' => array(
+                    array(
+                        'icon' => 'icons/16/black/info.png',
+                        'text' => $semester_select
+                    )
+                )
+            )
+        )
     );
 }
-Sidebar::Get()->addWidget($actions);
-
-$semester_select = new SelectWidget(
-    _("Nach Semester filtern"),
-    PluginEngine::getLink($plugin, array(), "my/files"),
-    "semester_id"
-);
-$semesters = array_reverse(Semester::getAll());
-$semester_select->addElement(new SelectElement("", _("Alle"), false));
-foreach ($semesters as $semester) {
-    $semester_select->addElement(new SelectElement(
-        $semester->getId(),
-        $semester['name'],
-        Request::get("semester_id") === $semester->getId()
-    ));
-}
-Sidebar::Get()->addWidget($semester_select);

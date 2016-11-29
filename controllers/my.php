@@ -37,12 +37,15 @@ class MyController extends PluginController {
             7 => $this->plugin->getPluginURL() .'/assets/52a-stopp2.svg'
         );
 
-        Helpbar::Get()->addLink(
-            _("Was bedeuten die Lizenzen?"),
-            PluginEngine::getURL($this->plugin, array(), "my/licensehelp"),
-            Assets::image_path("icons/white/question-circle"),
-            false,
-            array('data-dialog' => 1));
+        //The Helpbar isn't available in Stud.IP 2.5 and 3.0!
+        if (version_compare($GLOBALS['SOFTWARE_VERSION'], '3.1', '>=')) {
+            Helpbar::Get()->addLink(
+                _("Was bedeuten die Lizenzen?"),
+                PluginEngine::getURL($this->plugin, array(), "my/licensehelp"),
+                Assets::image_path("icons/white/question-circle"),
+                false,
+                array('data-dialog' => 1));
+        }
     }
 
     public function my_action()
@@ -75,12 +78,18 @@ class MyController extends PluginController {
             ));
             $documents_data = $statement->fetchAll(PDO::FETCH_ASSOC);
             $this->files = array();
-            foreach ($documents_data as $data) {
-                $this->files[] = StudipDocument::buildExisting($data);
+            foreach ($documents_data as $key => $row) {
+                //SORM::buildExisting and SORM::build are not available in Stud.IP 2.5:
+                $this->files[$key] = new StudipDocument();
+                $this->files[$key]->setData($row, false);
+                $this->files[$key]->setNew(false);
+                //$this->files[] = StudipDocument::build($data, false);
             }
         } else {
-            $this->files = DBManager::get()->fetchAll("
-                SELECT dokumente.*
+            //StudipPDO::fetchAll isn't available in Stud.IP 2.5,
+            //so we have to clone the functionality of that method in here:
+            
+            $sql = "SELECT dokumente.*
                 FROM dokumente INNER JOIN (
                     SELECT seminar_id as id FROM seminare
                     UNION
@@ -88,7 +97,20 @@ class MyController extends PluginController {
                 ) bla ON bla.id = dokumente.seminar_id
                 WHERE user_id = ?
                 AND dokumente.url = ''
-                ORDER BY mkdate DESC", array($GLOBALS['user']->id), 'StudipDocument::buildExisting');
+                ORDER BY mkdate DESC";
+            
+            $db = DBManager::get();
+            $statement = $db->prepare($sql);
+            $statement->execute(array($GLOBALS['user']->id));
+            $data = $statement->fetchAll(PDO::FETCH_COLUMN); //fetchFirst istn't available in Stud.IP 2.5
+            foreach($data as $key => $row) {
+                //SORM::buildExisting and SORM::build are not available in Stud.IP 2.5:
+                $data[$key] = new StudipDocument();
+                $data[$key]->setData($row, false);
+                $data[$key]->setNew(false);
+            }
+            
+            $this->files = $data;
         }
         $statement = DBManager::get()->prepare("
             SELECT * FROM document_licenses ORDER BY license_id <> 2 DESC, license_id ASC
