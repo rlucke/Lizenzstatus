@@ -223,7 +223,7 @@ if(version_compare($GLOBALS['SOFTWARE_VERSION'], '3.1', '>=')) {
         . PluginEngine::getURL($plugin, array(), '/my/files')
         . '" method="get"><select name="semester_id" onchange="$(this).closest(\'form\').submit();">';
         
-    $semester_select .= '<option id="" '
+    $semester_select .= '<option value="" '
             . (!Request::get('semester_id') ? 'selected="selected"' : '' )
             . '>' . _('Alle') . '</option>';
     
