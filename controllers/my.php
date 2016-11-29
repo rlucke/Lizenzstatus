@@ -102,15 +102,15 @@ class MyController extends PluginController {
             $db = DBManager::get();
             $statement = $db->prepare($sql);
             $statement->execute(array($GLOBALS['user']->id));
-            $data = $statement->fetchAll(PDO::FETCH_COLUMN); //fetchFirst istn't available in Stud.IP 2.5
+            $data = $statement->fetchAll(PDO::FETCH_ASSOC); //fetchFirst istn't available in Stud.IP 2.5
+            $this->files = array();
             foreach($data as $key => $row) {
                 //SORM::buildExisting and SORM::build are not available in Stud.IP 2.5:
-                $data[$key] = new StudipDocument();
-                $data[$key]->setData($row, false);
-                $data[$key]->setNew(false);
+                $this->files[$key] = new StudipDocument();
+                $this->files[$key]->setData($row, false);
+                $this->files[$key]->setNew(false);
             }
             
-            $this->files = $data;
         }
         $statement = DBManager::get()->prepare("
             SELECT * FROM document_licenses ORDER BY license_id <> 2 DESC, license_id ASC
