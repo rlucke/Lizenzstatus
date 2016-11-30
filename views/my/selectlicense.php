@@ -4,7 +4,7 @@
         <input type="hidden" name="d[]" value="<?= htmlReady($file) ?>">
     <? endforeach ?>
     <fieldset>
-        <legend><?= _("Lizenz auswählen") ?></legend>
+        <legend><?= dgettext('lizenzstatus', "Lizenz auswählen") ?></legend>
 
         <? foreach ($licenses as $license) : ?>
         <div style="display: flex; align-items: baseline; margin-top: 20px;">
@@ -23,6 +23,6 @@
         <? endforeach ?>
     </fieldset>
     <div data-dialog-button>
-        <?= \Studip\Button::create(_("Speichern"), 'store') ?>
+        <?= \Studip\Button::create(dgettext('lizenzstatus', "Speichern"), 'store') ?>
     </div>
 </form>

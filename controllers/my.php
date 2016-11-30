@@ -37,12 +37,10 @@ class MyController extends PluginController {
             7 => $this->plugin->getPluginURL() .'/assets/52a-stopp2.svg'
         );
         PageLayout::setHelpKeyword("Basis.DateienLizenzstatus"); // added by Fliegner
-
-        textdomain('lizenzstatus');
         //The Helpbar isn't available in Stud.IP 2.5 and 3.0!
         if (version_compare($GLOBALS['SOFTWARE_VERSION'], '3.1', '>=')) {
         Helpbar::Get()->addLink(
-            _("Was bedeuten die Lizenzen?"),
+            dgettext('lizenzstatus', "Was bedeuten die Lizenzen?"),
             PluginEngine::getURL($this->plugin, array(), "my/licensehelp"),
             Assets::image_path("icons/white/question-circle"),
             false,
@@ -146,7 +144,7 @@ class MyController extends PluginController {
                         $file->delete();
                     }
                 }
-                PageLayout::postMessage(MessageBox::success(_("Ausgewählte Dateien wurden gelöscht.")));
+                PageLayout::postMessage(MessageBox::success(dgettext('lizenzstatus', "Ausgewählte Dateien wurden gelöscht.")));
                 $this->redirect(
                     PluginEngine::getUrl(
                         $this->plugin,
@@ -168,7 +166,7 @@ class MyController extends PluginController {
     }
 
     public function selectlicense_action() {
-        PageLayout::setTitle(_("Ausgewählte Dateien verändern"));
+        PageLayout::setTitle(dgettext('lizenzstatus', "Ausgewählte Dateien verändern"));
         if (Request::isPost()) {
             foreach (Request::getArray("d") as $file) {
                 $this->file = new StudipDocument($file);
@@ -177,7 +175,7 @@ class MyController extends PluginController {
                     $this->file->store();
                 }
             }
-            PageLayout::postMessage(MessageBox::success(sprintf(_("%s Dokumente verändert."), count(Request::getArray("d")))));
+            PageLayout::postMessage(MessageBox::success(sprintf(dgettext('lizenzstatus', "%s Dokumente verändert."), count(Request::getArray("d")))));
             if(Request::option('semester_id')) {
                 $this->redirect(PluginEngine::getUrl(
                     $this->plugin,

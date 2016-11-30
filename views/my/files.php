@@ -4,18 +4,18 @@
 
     <table class="default filelist">
         <caption>
-            <?= _("Ihre selbst hochgeladenen Dokumente") ?>
+            <?= dgettext('lizenzstatus', "Ihre selbst hochgeladenen Dokumente") ?>
         </caption>
         <thead>
             <tr>
                 <th>
                     <input type="checkbox" data-proxyfor=".filelist :checkbox.file">
                 </th>
-                <th><a><?= _("Dateiname") ?></a></th>
-                <th><a><?= _("Veranstaltung") ?></a></th>
-                <th><a><?= _("Semester") ?></a></th>
-                <th><a><?= _("Datum") ?></a></th>
-                <th><a><?= _("Lizenzstatus") ?></a></th>
+                <th><a><?= dgettext('lizenzstatus', "Dateiname") ?></a></th>
+                <th><a><?= dgettext('lizenzstatus', "Veranstaltung") ?></a></th>
+                <th><a><?= dgettext('lizenzstatus', "Semester") ?></a></th>
+                <th><a><?= dgettext('lizenzstatus', "Datum") ?></a></th>
+                <th><a><?= dgettext('lizenzstatus', "Lizenzstatus") ?></a></th>
             </tr>
         </thead>
         <tbody>
@@ -54,7 +54,7 @@
                         'open' => $file->getId()
                     )) ?>">
                     <? $course = Course::find($file->seminar_id); ?>
-                    
+
                         <?= htmlReady($course ? $course->name : $file->institute->name) ?>
                     </a>
                 </td>
@@ -64,7 +64,7 @@
                         <? if ($course['duration_time'] != 0) : ?>
                             -
                             <? if ($course['duration_time'] == -1) : ?>
-                                <?= _("unbegrenzt") ?>
+                                <?= dgettext('lizenzstatus', "unbegrenzt") ?>
                             <? else : ?>
                                 <?= htmlReady($course->end_semester->name) ?>
                             <? endif ?>
@@ -74,7 +74,7 @@
                     <td data-timestamp="0">-</td>
                 <? endif ?>
                 <td data-timestamp="<?= htmlReady($file['mkdate']) ?>">
-                    <?= date("d.m.Y H:i", $file['mkdate'])." "._("Uhr") ?>
+                    <?= date("d.m.Y H:i", $file['mkdate'])." ".dgettext('lizenzstatus', "Uhr") ?>
                 </td>
                 <td data-timestamp="<?= htmlReady(($file['protected'] ? 'a' : 'b').$file['name']) ?>">
                     <? if ($access) : ?>
@@ -165,7 +165,7 @@ if(version_compare($GLOBALS['SOFTWARE_VERSION'], '3.1', '>=')) {
     //code for Stud.IP 3.1 to 3.5:
     $actions = new ActionsWidget();
     $actions->addLink(
-        _("Lizenzen der ausgewählten Dokumente setzen"),
+        dgettext('lizenzstatus', "Lizenzen der ausgewählten Dokumente setzen"),
         PluginEngine::getURL($plugin, array(), "my/selectlicense"),
         version_compare($GLOBALS['SOFTWARE_VERSION'], "3.4", ">=")
             ? Icon::create($plugin->getPluginURL()."/assets/license.svg")
@@ -174,23 +174,23 @@ if(version_compare($GLOBALS['SOFTWARE_VERSION'], '3.1', '>=')) {
     );
     if (Config::get()->ALLOW_MASS_FILE_DELETING) {
         $actions->addLink(
-            _("Ausgewählte Dateien löschen."),
+            dgettext('lizenzstatus', "Ausgewählte Dateien löschen."),
             "#",
             version_compare($GLOBALS['SOFTWARE_VERSION'], "3.4", ">=")
                 ? Icon::create("trash", "info")
                 : Assets::image_path("icons/16/black/trash"),
-            array('onClick' => "if (typeof STUDIP.Dialog.confirm !== 'undefined') { STUDIP.Dialog.confirm('". _("Wirklich alle ausgewählten Dateien löschen?") ."', function () { jQuery('#action').val('delete'); jQuery('#action_form').removeAttr('data-dialog', '1').submit(); }); } else if (window.confirm('". _("Wirklich alle ausgewählten Dateien löschen?") ."')) { jQuery('#action').val('delete'); jQuery('#action_form').removeAttr('data-dialog', '1').submit(); } return false;")
+            array('onClick' => "if (typeof STUDIP.Dialog.confirm !== 'undefined') { STUDIP.Dialog.confirm('". dgettext('lizenzstatus', "Wirklich alle ausgewählten Dateien löschen?") ."', function () { jQuery('#action').val('delete'); jQuery('#action_form').removeAttr('data-dialog', '1').submit(); }); } else if (window.confirm('". dgettext('lizenzstatus', "Wirklich alle ausgewählten Dateien löschen?") ."')) { jQuery('#action').val('delete'); jQuery('#action_form').removeAttr('data-dialog', '1').submit(); } return false;")
         );
     }
     Sidebar::Get()->addWidget($actions);
 
     $semester_select = new SelectWidget(
-        _("Nach Semester filtern"),
+        dgettext('lizenzstatus', "Nach Semester filtern"),
         PluginEngine::getLink($plugin, array(), "my/files"),
         "semester_id"
     );
     $semesters = array_reverse(Semester::getAll());
-    $semester_select->addElement(new SelectElement("", _("Alle"), false));
+    $semester_select->addElement(new SelectElement("", dgettext('lizenzstatus', "Alle"), false));
     foreach ($semesters as $semester) {
         $semester_select->addElement(new SelectElement(
             $semester->getId(),
@@ -201,48 +201,48 @@ if(version_compare($GLOBALS['SOFTWARE_VERSION'], '3.1', '>=')) {
     Sidebar::Get()->addWidget($semester_select);
 } else {
     //code for Stud.IP 2.5 and 3.0:
-    
+
     $action_links = '<a href="' . PluginEngine::getLink($plugin, array(), "my/selectlicense") . '" '
         . "onclick=\"jQuery('#action').val('selectlicense'); jQuery('#action_form').attr('data-dialog', '1').submit(); return false;\" "
         . '>' . Assets::img($plugin->getPluginURL().'/assets/license.svg',
                 array('size' => '16', 'class' => 'text-bottom')
             )
-        . _('Lizenzen der ausgewählten Dokumente setzen') . '</a><br>';
-    
+        . dgettext('lizenzstatus', 'Lizenzen der ausgewählten Dokumente setzen') . '</a><br>';
+
     if(Config::get()->ALLOW_MASS_FILE_DELETING) {
         $action_links .= '<a href="#" onclick="'
-                . "if (window.confirm('". _("Wirklich alle ausgewählten Dateien löschen?") ."')) { jQuery('#action').val('delete'); jQuery('#action_form').removeAttr('data-dialog', '1').submit(); } return false;"
+                . "if (window.confirm('". dgettext('lizenzstatus', "Wirklich alle ausgewählten Dateien löschen?") ."')) { jQuery('#action').val('delete'); jQuery('#action_form').removeAttr('data-dialog', '1').submit(); } return false;"
             . '" >' . Assets::img('icons/16/black/trash', array('size' => '16'))
-            . _('Ausgewählte Dateien löschen') . '</a><br>';
+            . dgettext('lizenzstatus', 'Ausgewählte Dateien löschen') . '</a><br>';
     }
-    
-    
+
+
     $semesters = array_reverse(Semester::getAll());
-    
+
     $semester_select = '<form novalidate="novalidate" action="'
         . PluginEngine::getLink($plugin, array(), 'my/files')
         . '" method="get"><select name="semester_id" onchange="$(this).closest(\'form\').submit();">';
-        
+
     $semester_select .= '<option value="" '
             . (!Request::get('semester_id') ? 'selected="selected"' : '' )
-            . '>' . _('Alle') . '</option>';
-    
+            . '>' . dgettext('lizenzstatus', 'Alle') . '</option>';
+
     foreach($semesters as $semester) {
         $semester_select .= '<option value="'. $semester['id'] .'"'
             . ((Request::get('semester_id') === $semester['id']) ? 'selected="selected"' : '' )
             . '>' . $semester['name'] . '</option>';
     }
-    
+
     $semester_select .= '</select><br><noscript>
-        <button type="submit" class="button" name="Zuweisen">' . _('Zuweisen')
+        <button type="submit" class="button" name="Zuweisen">' . dgettext('lizenzstatus', 'Zuweisen')
         . '</button></noscript></form>';
-    
-    
+
+
     $infobox = array(
         'picture' => '',
         'content' => array(
             array(
-                'kategorie' => _('Aktionen:'),
+                'kategorie' => dgettext('lizenzstatus', 'Aktionen:'),
                 'eintrag' => array(
                     array(
                         'icon' => 'icons/16/black/info.png',
@@ -250,9 +250,9 @@ if(version_compare($GLOBALS['SOFTWARE_VERSION'], '3.1', '>=')) {
                     )
                 )
             ),
-            
+
             array(
-                'kategorie' => _('Nach Semester filtern:'),
+                'kategorie' => dgettext('lizenzstatus', 'Nach Semester filtern:'),
                 'eintrag' => array(
                     array(
                         'icon' => 'icons/16/black/info.png',
