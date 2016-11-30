@@ -1,6 +1,22 @@
 <?php
 
-require_once 'app/controllers/plugin_controller.php';
+require_once __DIR__.'/../Lizenzstatus.class.php';
+
+//for Stud.IP 2.5 compatibility:
+if(!class_exists(Trails_Controller)) {
+    require_once 'vendor/trails/src/controller.php';
+}
+
+//depending if it's Stud.IP 2.5 or something newer we have
+//to include different classes to get the PluginController class.
+if (version_compare($GLOBALS['SOFTWARE_VERSION'], "3.0", ">=")) {
+    require_once 'app/controllers/plugin_controller.php';
+} else {
+    require_once __DIR__.'/../lib/PluginController25.class.php';
+}
+
+
+
 
 class MyController extends PluginController {
 
@@ -23,18 +39,27 @@ class MyController extends PluginController {
         PageLayout::setHelpKeyword("Basis.DateienLizenzstatus"); // added by Fliegner
 
         textdomain('lizenzstatus');
+        //The Helpbar isn't available in Stud.IP 2.5 and 3.0!
+        if (version_compare($GLOBALS['SOFTWARE_VERSION'], '3.1', '>=')) {
         Helpbar::Get()->addLink(
             _("Was bedeuten die Lizenzen?"),
             PluginEngine::getURL($this->plugin, array(), "my/licensehelp"),
             Assets::image_path("icons/white/question-circle"),
             false,
             array('data-dialog' => 1));
+            }
     }
 
     function after_filter(&$action, &$args)
     {
         parent::after_filter($action, $args);
         textdomain('studip');
+    }
+
+
+    public function my_action()
+    {
+
     }
 
     public function files_action()
@@ -61,12 +86,18 @@ class MyController extends PluginController {
             ));
             $documents_data = $statement->fetchAll(PDO::FETCH_ASSOC);
             $this->files = array();
-            foreach ($documents_data as $data) {
-                $this->files[] = StudipDocument::buildExisting($data);
+            foreach ($documents_data as $key => $row) {
+                //SORM::buildExisting and SORM::build are not available in Stud.IP 2.5:
+                $this->files[$key] = new StudipDocument();
+                $this->files[$key]->setData($row, false);
+                $this->files[$key]->setNew(false);
+                //$this->files[] = StudipDocument::build($data, false);
             }
         } else {
-            $this->files = DBManager::get()->fetchAll("
-                SELECT dokumente.*
+            //StudipPDO::fetchAll isn't available in Stud.IP 2.5,
+            //so we have to clone the functionality of that method in here:
+
+            $sql = "SELECT dokumente.*
                 FROM dokumente INNER JOIN (
                     SELECT seminar_id as id FROM seminare
                     UNION
@@ -74,7 +105,20 @@ class MyController extends PluginController {
                 ) bla ON bla.id = dokumente.seminar_id
                 WHERE user_id = ?
                 AND dokumente.url = ''
-                ORDER BY mkdate DESC", array($GLOBALS['user']->id), 'StudipDocument::buildExisting');
+                ORDER BY mkdate DESC";
+
+            $db = DBManager::get();
+            $statement = $db->prepare($sql);
+            $statement->execute(array($GLOBALS['user']->id));
+            $data = $statement->fetchAll(PDO::FETCH_ASSOC); //fetchFirst istn't available in Stud.IP 2.5
+            $this->files = array();
+            foreach($data as $key => $row) {
+                //SORM::buildExisting and SORM::build are not available in Stud.IP 2.5:
+                $this->files[$key] = new StudipDocument();
+                $this->files[$key]->setData($row, false);
+                $this->files[$key]->setNew(false);
+            }
+
         }
         $statement = DBManager::get()->prepare("
             SELECT * FROM document_licenses ORDER BY license_id <> 2 DESC, license_id ASC
@@ -103,10 +147,22 @@ class MyController extends PluginController {
                     }
                 }
                 PageLayout::postMessage(MessageBox::success(_("Ausgewählte Dateien wurden gelöscht.")));
-                $this->redirect("my/files".(Request::option("semester_id") ? "?semester_id=".Request::option("semester_id"): ""));
+                $this->redirect(
+                    PluginEngine::getUrl(
+                        $this->plugin,
+                        array('semester_id' => Request::option("semester_id")),
+                        'my/files'
+                    )
+                );
             } elseif (Request::get("action") === "selectlicense") {
                 $_SESSION['SWITCH_FILES'] = Request::getArray("d");
-                $this->redirect("my/selectlicense".(Request::option("semester_id") ? "?semester_id=".Request::option("semester_id"): ""));
+                $this->redirect(
+                    PluginEngine::getUrl(
+                        $this->plugin,
+                        array('semester_id' => Request::option("semester_id")),
+                        'my/selectlicense'
+                    )
+                );
             }
         }
     }
@@ -122,7 +178,21 @@ class MyController extends PluginController {
                 }
             }
             PageLayout::postMessage(MessageBox::success(sprintf(_("%s Dokumente verändert."), count(Request::getArray("d")))));
-            $this->redirect("my/files".(Request::option("semester_id") ? "?semester_id=".Request::option("semester_id"): ""));
+            if(Request::option('semester_id')) {
+                $this->redirect(PluginEngine::getUrl(
+                    $this->plugin,
+                    array(
+                        'semester_id' => Request::option('semester_id')
+                    ),
+                    'my/files'
+                ));
+            } else {
+                $this->redirect(PluginEngine::getUrl(
+                    $this->plugin,
+                    array(),
+                    'my/files'
+                ));
+            }
         }
         $statement = DBManager::get()->prepare("
             SELECT * FROM document_licenses WHERE license_id >= 2 ORDER BY license_id ASC
