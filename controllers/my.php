@@ -10,16 +10,31 @@ class MyController extends PluginController {
         Navigation::activateItem("/myprotectedfiles");
         $this->formclass = version_compare($GLOBALS['SOFTWARE_VERSION'], "3.5", ">=") ? "default" : "studip_form";
 
-        $this->icons = array(
-            0 => $this->plugin->getPluginURL() .'/assets/check-circle.svg',
-            1 => $this->plugin->getPluginURL() .'/assets/decline-circle.svg',
-            2 => $this->plugin->getPluginURL() .'/assets/question-circle.svg',
-            3 => $this->plugin->getPluginURL() .'/assets/own-license.svg',
-            4 => $this->plugin->getPluginURL() .'/assets/cc.svg',
-            5 => $this->plugin->getPluginURL() .'/assets/license.svg',
-            6 => $this->plugin->getPluginURL() .'/assets/52a.svg',
-            7 => $this->plugin->getPluginURL() .'/assets/52a-stopp2.svg'
-        );
+        if (true) {
+            $this->icons = array(
+                0 => $this->plugin->getPluginURL() . '/assets/check-circle.svg',
+                1 => $this->plugin->getPluginURL() . '/assets/decline-circle.svg',
+                2 => $this->plugin->getPluginURL() . '/assets/question-circle.svg',
+                3 => $this->plugin->getPluginURL() . '/assets/own-license.svg',
+                4 => $this->plugin->getPluginURL() . '/assets/cc.svg',
+                5 => $this->plugin->getPluginURL() . '/assets/license.svg',
+                6 => $this->plugin->getPluginURL() . '/assets/52a.svg',
+                7 => $this->plugin->getPluginURL() . '/assets/52a-stopp2.svg'
+            );
+        } else {
+            //hannover
+            $this->icons = array(
+                0 => $this->plugin->getPluginURL() . '/assets/check-circle.svg',
+                1 => $this->plugin->getPluginURL() . '/assets/decline-circle.svg',
+                2 => $this->plugin->getPluginURL() . '/assets/question-circle.svg',
+                3 => "", //gemeinfrei
+                4 => $this->plugin->getPluginURL() . '/assets/cc.svg',
+                5 => $this->plugin->getPluginURL() . '/assets/own-license.svg',
+                6 => $this->plugin->getPluginURL() . '/assets/license.svg',
+                7 => $this->plugin->getPluginURL() . '/assets/52a-stopp2.svg',
+                8 => $this->plugin->getPluginURL() . '/assets/52a.svg'
+            );
+        }
 
         Helpbar::Get()->addLink(
             _("Was bedeuten die Lizenzen?"),
