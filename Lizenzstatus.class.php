@@ -6,7 +6,9 @@ class Lizenzstatus extends StudIPPlugin implements SystemPlugin {
 
     public function __construct() {
         parent::__construct();
-        $nav = new Navigation(_("Lizenzstatus"));
+        bindtextdomain('lizenzstatus', dirname(__FILE__).'/locale');
+        bind_textdomain_codeset('lizenzstatus', 'windows-1252');
+        $nav = new Navigation(dgettext('lizenzstatus', "Lizenzstatus"));
         if (version_compare($GLOBALS['SOFTWARE_VERSION'], "3.4", ">=")) {
             $nav->setImage(
                 Icon::create("files", "navigation")

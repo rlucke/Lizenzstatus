@@ -20,13 +20,21 @@ class MyController extends PluginController {
             6 => $this->plugin->getPluginURL() .'/assets/52a.svg',
             7 => $this->plugin->getPluginURL() .'/assets/52a-stopp2.svg'
         );
+        PageLayout::setHelpKeyword("Basis.DateienLizenzstatus"); // added by Fliegner
 
+        textdomain('lizenzstatus');
         Helpbar::Get()->addLink(
             _("Was bedeuten die Lizenzen?"),
             PluginEngine::getURL($this->plugin, array(), "my/licensehelp"),
             Assets::image_path("icons/white/question-circle"),
             false,
             array('data-dialog' => 1));
+    }
+
+    function after_filter(&$action, &$args)
+    {
+        parent::after_filter($action, $args);
+        textdomain('studip');
     }
 
     public function files_action()
