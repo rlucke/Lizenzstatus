@@ -76,7 +76,7 @@
                 <td data-timestamp="<?= htmlReady($file['mkdate']) ?>">
                     <?= date("d.m.Y H:i", $file['mkdate'])." ".dgettext('lizenzstatus', "Uhr") ?>
                 </td>
-                <td data-timestamp="<?= htmlReady(($file['protected'] ? 'a' : 'b').$file['name']) ?>">
+                <td data-timestamp="<?= $file['protected'] + 1?>">
                     <? if ($access) : ?>
                         <?
                             $actionmenu = MyProtectedFiles\ActionMenu::get();
