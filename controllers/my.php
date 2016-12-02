@@ -17,7 +17,6 @@ if (version_compare($GLOBALS['SOFTWARE_VERSION'], "3.0", ">=")) {
 
 
 
-
 class MyController extends PluginController {
 
     function before_filter(&$action, &$args)

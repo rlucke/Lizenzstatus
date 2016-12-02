@@ -13,7 +13,10 @@
             </div>
             <div>
             <label for="license_<?= htmlReady($license['license_id']) ?>">
-                <h3 style="margin-top: 0px;"><?= htmlReady($license['name']) ?></h3>
+                <h3 style="margin-top: 0px;">
+                    <?= htmlReady($license['name']) ?>
+                    <img src="<?= $icons[$license['license_id']] ?>" height="20px" class="text-bottom">
+                </h3>
                 <div>
                     <?= formatReady($license['description']) ?>
                 </div>
