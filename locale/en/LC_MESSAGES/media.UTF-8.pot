@@ -1,0 +1,119 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2016-11-30 18:44+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../views/my/selectlicense.php:7 ../views/shared/action-menu.php:26
+msgid "Lizenz auswählen"
+msgstr ""
+
+#: ../views/my/selectlicense.php:26
+msgid "Speichern"
+msgstr ""
+
+#: ../views/my/files.php:7
+msgid "Ihre selbst hochgeladenen Dokumente"
+msgstr ""
+
+#: ../views/my/files.php:14
+msgid "Dateiname"
+msgstr ""
+
+#: ../views/my/files.php:15
+msgid "Veranstaltung"
+msgstr ""
+
+#: ../views/my/files.php:16
+msgid "Semester"
+msgstr ""
+
+#: ../views/my/files.php:17
+msgid "Datum"
+msgstr ""
+
+#: ../views/my/files.php:18 ../Lizenzstatus.class.php:21
+msgid "Lizenzstatus"
+msgstr ""
+
+#: ../views/my/files.php:67
+msgid "unbegrenzt"
+msgstr ""
+
+#: ../views/my/files.php:77
+msgid "Uhr"
+msgstr ""
+
+#: ../views/my/files.php:168 ../views/my/files.php:210
+msgid "Lizenzen der ausgewählten Dokumente setzen"
+msgstr ""
+
+#: ../views/my/files.php:177
+msgid "Ausgewählte Dateien löschen."
+msgstr ""
+
+#: ../views/my/files.php:182 ../views/my/files.php:214
+msgid "Wirklich alle ausgewählten Dateien löschen?"
+msgstr ""
+
+#: ../views/my/files.php:188
+msgid "Nach Semester filtern"
+msgstr ""
+
+#: ../views/my/files.php:193 ../views/my/files.php:228
+msgid "Alle"
+msgstr ""
+
+#: ../views/my/files.php:216
+msgid "Ausgewählte Dateien löschen"
+msgstr ""
+
+#: ../views/my/files.php:237
+msgid "Zuweisen"
+msgstr ""
+
+#: ../views/my/files.php:245
+msgid "Aktionen:"
+msgstr ""
+
+#: ../views/my/files.php:255
+msgid "Nach Semester filtern:"
+msgstr ""
+
+#: ../views/shared/action-menu.php:16
+msgid "Aktionen"
+msgstr ""
+
+#: ../controllers/my.php:43
+msgid "Was bedeuten die Lizenzen?"
+msgstr ""
+
+#: ../controllers/my.php:147
+msgid "Ausgewählte Dateien wurden gelöscht."
+msgstr ""
+
+#: ../controllers/my.php:169
+msgid "Ausgewählte Dateien verändern"
+msgstr ""
+
+#: ../controllers/my.php:178
+#, php-format
+msgid "%s Dokumente verändert."
+msgstr ""
+
+#: ../Lizenzstatus.class.php:53
+msgid "Informationen zu Uploads von Texten"
+msgstr ""

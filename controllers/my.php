@@ -26,7 +26,21 @@ class MyController extends PluginController {
         Navigation::activateItem("/myprotectedfiles");
         $this->formclass = version_compare($GLOBALS['SOFTWARE_VERSION'], "3.5", ">=") ? "default" : "studip_form";
 
-        if (true) {
+        /*$GLOBALS['LICENSE_ICONS'] = array( //hannover
+            0 => $GLOBALS['ABSOLUTE_URI_STUDIP'] . 'plugins_packages/data-quest/Lizenzstatus/assets/check-circle.svg',
+            1 => $GLOBALS['ABSOLUTE_URI_STUDIP'] . 'plugins_packages/data-quest/Lizenzstatus/assets/decline-circle.svg',
+            2 => $GLOBALS['ABSOLUTE_URI_STUDIP'] . 'plugins_packages/data-quest/Lizenzstatus/assets/question-circle.svg',
+            3 => $GLOBALS['ABSOLUTE_URI_STUDIP'] . 'plugins_packages/data-quest/Lizenzstatus/assets/public-domain.svg', //gemeinfrei
+            4 => $GLOBALS['ABSOLUTE_URI_STUDIP'] . 'plugins_packages/data-quest/Lizenzstatus/assets/cc.svg',
+            5 => $GLOBALS['ABSOLUTE_URI_STUDIP'] . 'plugins_packages/data-quest/Lizenzstatus/assets/own-license.svg',
+            6 => $GLOBALS['ABSOLUTE_URI_STUDIP'] . 'plugins_packages/data-quest/Lizenzstatus/assets/license.svg',
+            7 => $GLOBALS['ABSOLUTE_URI_STUDIP'] . 'plugins_packages/data-quest/Lizenzstatus/assets/52a-stopp2.svg',
+            8 => $GLOBALS['ABSOLUTE_URI_STUDIP'] . 'plugins_packages/data-quest/Lizenzstatus/assets/52a.svg'
+        );*/
+        if ($GLOBALS['LICENSE_ICONS']) {
+            $this->icons = $GLOBALS['LICENSE_ICONS'];
+
+        } else {
             $this->icons = array(
                 0 => $this->plugin->getPluginURL() . '/assets/check-circle.svg',
                 1 => $this->plugin->getPluginURL() . '/assets/decline-circle.svg',
@@ -37,38 +51,32 @@ class MyController extends PluginController {
                 6 => $this->plugin->getPluginURL() . '/assets/52a.svg',
                 7 => $this->plugin->getPluginURL() . '/assets/52a-stopp2.svg'
             );
-        } else {
-            //hannover
-            $this->icons = array(
-                0 => $this->plugin->getPluginURL() . '/assets/check-circle.svg',
-                1 => $this->plugin->getPluginURL() . '/assets/decline-circle.svg',
-                2 => $this->plugin->getPluginURL() . '/assets/question-circle.svg',
-                3 => "", //gemeinfrei
-                4 => $this->plugin->getPluginURL() . '/assets/cc.svg',
-                5 => $this->plugin->getPluginURL() . '/assets/own-license.svg',
-                6 => $this->plugin->getPluginURL() . '/assets/license.svg',
-                7 => $this->plugin->getPluginURL() . '/assets/52a-stopp2.svg',
-                8 => $this->plugin->getPluginURL() . '/assets/52a.svg'
-            );
         }
 
+        PageLayout::setHelpKeyword("Basis.DateienLizenzstatus"); // added by Fliegner
         //The Helpbar isn't available in Stud.IP 2.5 and 3.0!
         if (version_compare($GLOBALS['SOFTWARE_VERSION'], '3.1', '>=')) {
-            Helpbar::Get()->addLink(
-                _("Was bedeuten die Lizenzen?"),
-                PluginEngine::getURL($this->plugin, array(), "my/licensehelp"),
-                Assets::image_path("icons/white/question-circle"),
-                false,
-                array('data-dialog' => 1));
-        }
+        Helpbar::Get()->addLink(
+            dgettext('lizenzstatus', "Was bedeuten die Lizenzen?"),
+            PluginEngine::getURL($this->plugin, array(), "my/licensehelp"),
+            Assets::image_path("icons/white/question-circle"),
+            false,
+            array('data-dialog' => 1));
+            }
     }
+
+    function after_filter($action, $args)
+    {
+        parent::after_filter($action, $args);
+        textdomain('studip');
+    }
+
 
     public function my_action()
     {
-    
+
     }
-    
-    
+
     public function files_action()
     {
         PageLayout::addScript($this->plugin->getPluginURL()."/assets/jquery.tablesorter-2.22.5.js");
@@ -103,7 +111,7 @@ class MyController extends PluginController {
         } else {
             //StudipPDO::fetchAll isn't available in Stud.IP 2.5,
             //so we have to clone the functionality of that method in here:
-            
+
             $sql = "SELECT dokumente.*
                 FROM dokumente INNER JOIN (
                     SELECT seminar_id as id FROM seminare
@@ -113,7 +121,7 @@ class MyController extends PluginController {
                 WHERE user_id = ?
                 AND dokumente.url = ''
                 ORDER BY mkdate DESC";
-            
+
             $db = DBManager::get();
             $statement = $db->prepare($sql);
             $statement->execute(array($GLOBALS['user']->id));
@@ -125,7 +133,7 @@ class MyController extends PluginController {
                 $this->files[$key]->setData($row, false);
                 $this->files[$key]->setNew(false);
             }
-            
+
         }
         $statement = DBManager::get()->prepare("
             SELECT * FROM document_licenses ORDER BY license_id <> 2 DESC, license_id ASC
@@ -153,7 +161,7 @@ class MyController extends PluginController {
                         $file->delete();
                     }
                 }
-                PageLayout::postMessage(MessageBox::success(_("Ausgewählte Dateien wurden gelöscht.")));
+                PageLayout::postMessage(MessageBox::success(dgettext('lizenzstatus', "Ausgewählte Dateien wurden gelöscht.")));
                 $this->redirect(
                     PluginEngine::getUrl(
                         $this->plugin,
@@ -175,7 +183,7 @@ class MyController extends PluginController {
     }
 
     public function selectlicense_action() {
-        PageLayout::setTitle(_("Ausgewählte Dateien verändern"));
+        PageLayout::setTitle(dgettext('lizenzstatus', "Ausgewählte Dateien verändern"));
         if (Request::isPost()) {
             foreach (Request::getArray("d") as $file) {
                 $this->file = new StudipDocument($file);
@@ -184,7 +192,7 @@ class MyController extends PluginController {
                     $this->file->store();
                 }
             }
-            PageLayout::postMessage(MessageBox::success(sprintf(_("%s Dokumente verändert."), count(Request::getArray("d")))));
+            PageLayout::postMessage(MessageBox::success(sprintf(dgettext('lizenzstatus', "%s Dokumente verändert."), count(Request::getArray("d")))));
             if(Request::option('semester_id')) {
                 $this->redirect(PluginEngine::getUrl(
                     $this->plugin,

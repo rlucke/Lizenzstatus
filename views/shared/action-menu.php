@@ -13,7 +13,7 @@ $attributes = function (array $attributes) {
 };
 ?>
 <nav class="lizenzstatus-action-menu">
-    <div class="action-menu-icon" title="<?= htmlReady($title ?: _('Aktionen')) ?>">
+    <div class="action-menu-icon" title="<?= htmlReady($title ?: dgettext('lizenzstatus', 'Aktionen')) ?>">
         <img src="<?= htmlReady($icon) ?>" width="20px" height="20px" class="license">
         <? if (version_compare($GLOBALS['SOFTWARE_VERSION'], "3.4", ">=")) : ?>
             <?= Icon::create("decline", "clickable")->asImg("20px", array('class' => "decline"))  ?>
@@ -23,7 +23,7 @@ $attributes = function (array $attributes) {
     </div>
     <div class="action-menu-content">
         <div class="action-menu-title">
-            <?= _('Lizenz auswählen') ?>
+            <?= dgettext('lizenzstatus', 'Lizenz auswählen') ?>
         </div>
         <ul class="action-menu-list">
         <? foreach ($actions as $action): ?>

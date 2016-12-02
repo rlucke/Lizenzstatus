@@ -8,7 +8,7 @@
  *  the License, or (at your option) any later version.
  */
 
- 
+
 require_once __DIR__."/lib/ActionMenu.php";
 //require_once __DIR__."/controllers/my.php"; //for Stud.IP 2.5 compatibility
 
@@ -16,7 +16,9 @@ class Lizenzstatus extends StudIPPlugin implements SystemPlugin {
 
     public function __construct() {
         parent::__construct();
-        $nav = new Navigation(_("Lizenzstatus"));
+        bindtextdomain('lizenzstatus', dirname(__FILE__).'/locale');
+        bind_textdomain_codeset('lizenzstatus', 'windows-1252');
+        $nav = new Navigation(dgettext('lizenzstatus', "Lizenzstatus"));
         if (version_compare($GLOBALS['SOFTWARE_VERSION'], "3.4", ">=")) {
             $nav->setImage(
                 Icon::create("files", "navigation")
@@ -48,7 +50,7 @@ class Lizenzstatus extends StudIPPlugin implements SystemPlugin {
                 <script>
                     jQuery(function () {
                         STUDIP.Dialog.show(jQuery("#52a_info_text").html(), {
-                            title: "'._("Informationen zu Uploads von Texten").'"
+                            title: "'.dgettext('lizenzstatus', "Informationen zu Uploads von Texten").'"
                         });
                     });
                 </script>
@@ -56,8 +58,8 @@ class Lizenzstatus extends StudIPPlugin implements SystemPlugin {
             $_SESSION['HAS_SEEN_52A_INFO'] = true;
         }
     }
-    
-    
+
+
     /**
     * This method dispatches and displays all actions. It uses the template
     * method design pattern, so you may want to implement the methods #route
