@@ -177,11 +177,19 @@ if(version_compare($GLOBALS['SOFTWARE_VERSION'], '3.1', '>=')) {
             dgettext('lizenzstatus', "Ausgewählte Dateien löschen."),
             "#",
             version_compare($GLOBALS['SOFTWARE_VERSION'], "3.4", ">=")
-                ? Icon::create("trash", "info")
-                : Assets::image_path("icons/16/black/trash"),
+                ? Icon::create("trash", "clickable")
+                : Assets::image_path("icons/16/blue/trash"),
             array('onClick' => "if (typeof STUDIP.Dialog.confirm !== 'undefined') { STUDIP.Dialog.confirm('". dgettext('lizenzstatus', "Wirklich alle ausgewählten Dateien löschen?") ."', function () { jQuery('#action').val('delete'); jQuery('#action_form').removeAttr('data-dialog', '1').submit(); }); } else if (window.confirm('". dgettext('lizenzstatus', "Wirklich alle ausgewählten Dateien löschen?") ."')) { jQuery('#action').val('delete'); jQuery('#action_form').removeAttr('data-dialog', '1').submit(); } return false;")
         );
     }
+    $actions->addLink(
+        dgettext('lizenzstatus', "Ausgewählte Dateien herunterladen."),
+        "#2",
+        version_compare($GLOBALS['SOFTWARE_VERSION'], "3.4", ">=")
+            ? Icon::create("download", "clickable")
+            : Assets::image_path("icons/16/blue/download"),
+        array('onClick' => "jQuery('#action').val('download'); jQuery('#action_form').removeAttr('data-dialog', '1').submit(); return false;")
+    );
     Sidebar::Get()->addWidget($actions);
 
     $semester_select = new SelectWidget(
@@ -212,9 +220,14 @@ if(version_compare($GLOBALS['SOFTWARE_VERSION'], '3.1', '>=')) {
     if(Config::get()->ALLOW_MASS_FILE_DELETING) {
         $action_links .= '<a href="#" onclick="'
                 . "if (window.confirm('". dgettext('lizenzstatus', "Wirklich alle ausgewählten Dateien löschen?") ."')) { jQuery('#action').val('delete'); jQuery('#action_form').removeAttr('data-dialog', '1').submit(); } return false;"
-            . '" >' . Assets::img('icons/16/black/trash', array('size' => '16'))
+            . '" >' . Assets::img('icons/16/blue/trash', array('size' => '16'))
             . dgettext('lizenzstatus', 'Ausgewählte Dateien löschen') . '</a><br>';
     }
+
+    $action_links .= '<a href="#" onclick="'
+        . "jQuery('#action').val('download'); jQuery('#action_form').removeAttr('data-dialog', '1').submit(); return false;"
+        . '" >' . Assets::img('icons/16/blue/download', array('size' => '16'))
+        . dgettext('lizenzstatus', 'Ausgewählte Dateien herunterladen.') . '</a><br>';
 
 
     $semesters = array_reverse(Semester::getAll());

@@ -61,26 +61,25 @@ msgstr "clock"
 msgid "Lizenzen der ausgewählten Dokumente setzen"
 msgstr "select license for choosen files"
 
-#: ../views/my/files.php:177
-msgid "Ausgewählte Dateien löschen."
-msgstr "delete choosen files"
-
 #: ../views/my/files.php:182 ../views/my/files.php:214
 msgid "Wirklich alle ausgewählten Dateien löschen?"
 msgstr "Confirm deletion of selected files."
 
 #: ../views/my/files.php:188
 msgid "Nach Semester filtern"
-msgstr "filter for semester"
+msgstr "Filter for semester"
 
 #: ../views/my/files.php:193 ../views/my/files.php:228
 msgid "Alle"
-msgstr "all"
+msgstr "All"
 
 #: ../views/my/files.php:216
 #, fuzzy
 msgid "Ausgewählte Dateien löschen"
-msgstr "delete choosen files"
+msgstr "Delete chosen files"
+
+msgid "Ausgewählte Dateien herunterladen."
+msgstr "Download chosen files."
 
 #: ../views/my/files.php:237
 msgid "Zuweisen"
@@ -106,7 +105,7 @@ msgstr "What do the licenses mean for you?"
 
 #: ../controllers/my.php:147
 msgid "Ausgewählte Dateien wurden gelöscht."
-msgstr "Selected files were deleted"
+msgstr "Selected files were deleted."
 
 #: ../controllers/my.php:169
 msgid "Ausgewählte Dateien verändern"

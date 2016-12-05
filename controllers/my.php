@@ -177,6 +177,15 @@ class MyController extends PluginController {
                         'my/selectlicense'
                     )
                 );
+            } elseif (Request::get("action") === "download") {
+                $_SESSION['DOWNLOAD_FILES'] = Request::getArray("d");
+                $this->redirect(
+                    PluginEngine::getUrl(
+                        $this->plugin,
+                        array('semester_id' => Request::option("semester_id")),
+                        'my/download'
+                    )
+                );
             }
         }
     }
@@ -224,6 +233,39 @@ class MyController extends PluginController {
         ");
         $statement->execute();
         $this->licenses = $statement->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function download_action()
+    {
+        $folder = $GLOBALS['TMP_PATH']."/".md5(uniqid());
+        mkdir($folder);
+        foreach ($_SESSION['DOWNLOAD_FILES'] as $file_id) {
+            $datei = new StudipDocument($file_id);
+            if ($datei->checkAccess($GLOBALS['user']->id)) {
+                $i = "";
+                $filename_parts = explode(".", $datei['filename']);
+                if (count($filename_parts) > 1) {
+                    $ending = array_pop($filename_parts);
+                } else {
+                    $ending = "";
+                }
+                $name = implode(".", $filename_parts);
+                $filename = $folder."/".$name.($i ? "(".$i.")" : "").($ending ? ".".$ending : "");
+                while (file_exists($filename)) {
+                    $i++;
+                    $filename = $folder."/".$name.($i ? "(".$i.")" : "").($ending ? ".".$ending : "");
+                }
+                copy(get_upload_file_path($file_id), $filename);
+            }
+        }
+        unset($_SESSION['DOWNLOAD_FILES']);
+        create_zip_from_directory($folder, $folder.".zip");
+        echo file_get_contents($folder.".zip");
+        rmdirr($folder);
+        @unlink($folder.".zip");
+        $this->response->add_header("Content-Type", "application/zip; filename=\"Meine Dateien.zip\"");
+        $this->response->add_header("Content-Disposition", "attachment; filename=\"Meine Dateien.zip\"");
+        $this->render_nothing();
     }
 
 
