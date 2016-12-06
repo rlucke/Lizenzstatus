@@ -5,6 +5,7 @@
     <table class="default filelist">
         <caption>
             <?= dgettext('lizenzstatus', "Ihre selbst hochgeladenen Dokumente") ?>
+            &nbsp;(<?=count($files)?>)
         </caption>
         <thead>
             <tr>
