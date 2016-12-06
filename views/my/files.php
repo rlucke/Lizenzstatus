@@ -4,8 +4,15 @@
 
     <table class="default filelist">
         <caption>
+            <? if ($course): ?>
+            <?= sprintf(
+                dgettext('lizenzstatus', 'Hochgeladene Dokumente in Veranstaltung %s'),
+                $course->name
+                ) ?>&nbsp;(<?=count($files)?>)
+            <? else: ?>
             <?= dgettext('lizenzstatus', "Ihre selbst hochgeladenen Dokumente") ?>
             &nbsp;(<?=count($files)?>)
+            <? endif ?>
         </caption>
         <thead>
             <tr>
@@ -13,8 +20,12 @@
                     <input type="checkbox" data-proxyfor=".filelist :checkbox.file">
                 </th>
                 <th><a><?= dgettext('lizenzstatus', "Dateiname") ?></a></th>
+                <? if ($course): ?>
+                <th><a><?= dgettext('lizenzstatus', 'Nutzer') ?></a></th>
+                <? else: ?>
                 <th><a><?= dgettext('lizenzstatus', "Veranstaltung") ?></a></th>
                 <th><a><?= dgettext('lizenzstatus', "Semester") ?></a></th>
+                <? endif ?>
                 <th><a><?= dgettext('lizenzstatus', "Datum") ?></a></th>
                 <th><a><?= dgettext('lizenzstatus', "Lizenzstatus") ?></a></th>
             </tr>
@@ -22,10 +33,10 @@
         <tbody>
         <? foreach ($files as $file) : ?>
             <? $access = $file->checkAccess($GLOBALS['user']->id) ?>
-            <? if (!$access) continue; ?>
+            <? if (!$access and !$course) continue; ?>
             <tr id="doc_<?= htmlReady($file->getId()) ?>" data-dokument_id="<?= htmlReady($file->getId()) ?>">
                 <td>
-                    <? if ($access) : ?>
+                    <? if ($access or $course) : ?>
                         <input type="checkbox" class="file" name="d[]" value="<?= $file->getId() ?>">
                     <? endif ?>
                 </td>
@@ -42,43 +53,63 @@
                     </a>
                     <? endif ?>
                 </td>
-                <td>
-                    <a href="<?= URLHelper::getLink("folder.php#anker", array(
-                        'cid' => $file['seminar_id'],
-                        'data' => array(
-                            'cmd' => "tree",
-                            'open' => array(
-                                $file['range_id'] => 1,
-                                $file->getId() => 1
-                            )
-                        ),
-                        'open' => $file->getId()
-                    )) ?>">
-                    <? $course = Course::find($file->seminar_id); ?>
+                <? if ($course): ?>
+                    <td>
+                        <a href="<?= URLHelper::getLink("folder.php#anker", array(
+                            'user_id' => $file['user_id'],
+                            'data' => array(
+                                'cmd' => "tree",
+                                'open' => array(
+                                    $file['range_id'] => 1,
+                                    $file->getId() => 1
+                                )
+                            ),
+                            'open' => $file->getId()
+                        )) ?>">
+                        <? $file_user = User::find($file->user_id); ?>
 
-                        <?= htmlReady($course ? $course->name : $file->institute->name) ?>
-                    </a>
-                </td>
-                <? if ($course) : ?>
-                    <td data-timestamp="<?= htmlReady($course->start_semester->beginn) ?>">
-                        <?= htmlReady($course->start_semester->name) ?>
-                        <? if ($course['duration_time'] != 0) : ?>
+                            <?= htmlReady($file_user ? $file_user->getFullName() : dgettext('lizenzstatus', 'unbekannt')) ?>
+                        </a>
+                    </td>
+                <? else: ?>
+                    <td>
+                        <a href="<?= URLHelper::getLink("folder.php#anker", array(
+                            'cid' => $file['seminar_id'],
+                            'data' => array(
+                                'cmd' => "tree",
+                                'open' => array(
+                                    $file['range_id'] => 1,
+                                    $file->getId() => 1
+                                )
+                            ),
+                            'open' => $file->getId()
+                        )) ?>">
+                        <? $file_course = Course::find($file->seminar_id); ?>
+
+                            <?= htmlReady($file_course ? $file_course->name : $file->institute->name) ?>
+                        </a>
+                    </td>
+                    <? if ($file_course) : ?>
+                    <td data-timestamp="<?= htmlReady($file_course->start_semester->beginn) ?>">
+                        <?= htmlReady($file_course->start_semester->name) ?>
+                        <? if ($file_course['duration_time'] != 0) : ?>
                             -
-                            <? if ($course['duration_time'] == -1) : ?>
+                            <? if ($file_course['duration_time'] == -1) : ?>
                                 <?= dgettext('lizenzstatus', "unbegrenzt") ?>
                             <? else : ?>
-                                <?= htmlReady($course->end_semester->name) ?>
+                                <?= htmlReady($file_course->end_semester->name) ?>
                             <? endif ?>
                         <? endif ?>
                     </td>
-                <? else : ?>
-                    <td data-timestamp="0">-</td>
+                    <? else : ?>
+                        <td data-timestamp="0">-</td>
+                    <? endif ?>
                 <? endif ?>
                 <td data-timestamp="<?= htmlReady($file['mkdate']) ?>">
                     <?= date("d.m.Y H:i", $file['mkdate'])." ".dgettext('lizenzstatus', "Uhr") ?>
                 </td>
                 <td data-timestamp="<?= $file['protected'] + 1?>">
-                    <? if ($access) : ?>
+                    <? if ($access or $course) : ?>
                         <?
                             $actionmenu = MyProtectedFiles\ActionMenu::get();
                             $actionmenu->icon = $icons[$file['protected']];
@@ -130,7 +161,11 @@
         toggle: function (license_id) {
             var dokument_id = jQuery(this).closest("tr").data("dokument_id");
             jQuery.ajax({
+            <? if ($course) : ?>
+                "url": STUDIP.ABSOLUTE_URI_STUDIP + "plugins.php/lizenzstatus/my/toggle/" + dokument_id + '?course_id=<?= $course->id ?>',
+            <? else : ?>
                 "url": STUDIP.ABSOLUTE_URI_STUDIP + "plugins.php/lizenzstatus/my/toggle/" + dokument_id,
+            <? endif ?>
                 "data": {
                     "protected": license_id
                 },
@@ -191,6 +226,17 @@ if(version_compare($GLOBALS['SOFTWARE_VERSION'], '3.1', '>=')) {
             : Assets::image_path("icons/16/blue/download"),
         array('onClick' => "jQuery('#action').val('download'); jQuery('#action_form').removeAttr('data-dialog', '1').submit(); return false;")
     );
+    
+    if(Request::get('cid')) {
+        $actions->addLink(
+            dgettext('lizenzstatus', 'Zurück zu meinen Dateien'),
+            PluginEngine::getUrl($this->plugin, array(), 'my/reset'),
+            version_compare($GLOBALS['SOFTWARE_VERSION'], "3.4", ">=")
+                ? Icon::create('headache', 'clickable')
+                : Assets::image_path('icons/16/blue/headache')
+        );
+    }
+    
     Sidebar::Get()->addWidget($actions);
 
     $semester_select = new SelectWidget(

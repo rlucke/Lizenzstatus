@@ -1,0 +1,4 @@
+<? if (!$error): ?>
+<? $course_search ?>
+
+<? endif ?>

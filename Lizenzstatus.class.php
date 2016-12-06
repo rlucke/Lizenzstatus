@@ -18,6 +18,12 @@ class Lizenzstatus extends StudIPPlugin implements SystemPlugin {
         parent::__construct();
         bindtextdomain('lizenzstatus', dirname(__FILE__).'/locale');
         bind_textdomain_codeset('lizenzstatus', 'windows-1252');
+        
+        if(!Request::get('cid')) {
+            URLHelper::removeLinkParam('cid');
+        }
+        
+        
         $nav = new Navigation(dgettext('lizenzstatus', "Lizenzstatus"));
         if (version_compare($GLOBALS['SOFTWARE_VERSION'], "3.4", ">=")) {
             $nav->setImage(
@@ -39,6 +45,21 @@ class Lizenzstatus extends StudIPPlugin implements SystemPlugin {
         $this->addStylesheet("assets/actionmenu.less");
         PageLayout::addScript($this->getPluginURL()."/assets/actionmenu.js");
         Navigation::addItem("/myprotectedfiles", $nav);
+        
+        global $perm;
+        if($perm->have_perm('admin')) {
+            //only admins need tabs:
+            $subnav = new Navigation(dgettext('lizenzstatus', 'Dateien'));
+            $subnav->setURL(PluginEngine::getURL($this, array(), 'my/files'));
+            $nav->addSubNavigation('files', $subnav);
+            
+        
+            $subnav = new Navigation(dgettext('lizenzstatus', 'Suche nach Veranstaltungen'));
+            $subnav->setUrl(PluginEngine::getURL($this, array(), 'my/search'));
+            $nav->addSubNavigation('search', $subnav);
+        }
+        
+        
         if (((($GLOBALS['i_page'] === "folder.php") && $GLOBALS['perm']->have_studip_perm("tutor", $_SESSION['SessionSeminar']))
                     || (stripos($_SERVER['REQUEST_URI'], "plugins.php/myprotectedfiles") !== false))
                 && !$_SESSION['HAS_SEEN_52A_INFO']

@@ -1,6 +1,9 @@
 <?php
 
 require_once __DIR__.'/../Lizenzstatus.class.php';
+require_once 'lib/classes/PageLayout.php';
+require_once 'lib/classes/searchtypes/SeminarSearch.class.php';
+
 
 //for Stud.IP 2.5 compatibility:
 if(!class_exists(Trails_Controller)) {
@@ -23,6 +26,7 @@ class MyController extends PluginController {
     {
         parent::before_filter($action, $args);
         Navigation::activateItem("/myprotectedfiles");
+        
         $this->formclass = version_compare($GLOBALS['SOFTWARE_VERSION'], "3.5", ">=") ? "default" : "studip_form";
 
         /*$GLOBALS['LICENSE_ICONS'] = array( //hannover
@@ -76,8 +80,80 @@ class MyController extends PluginController {
 
     }
 
+    
+    /**
+     * Responsible for removing the cid-parameter
+     */
+    public function reset_action()
+    {
+        URLHelper::removeLinkParam('cid');
+        
+        $this->redirect(PluginEngine::getURL($this->plugin, array(), 'my/files'));
+    }
+
+    public function search_action()
+    {
+        Navigation::activateItem("/myprotectedfiles");
+        if(Navigation::hasItem("/myprotectedfiles/search")) {
+            Navigation::activateItem("/myprotectedfiles/search");
+        }
+        
+        global $perm;
+        
+        if(!$perm->have_perm('admin')) {
+            PageLayout::postMessage(
+                MessageBox::error(
+                    dgettext('lizenzstatus', 'Sie sind nicht dazu berechtigt, diese Seite aufzurufen!')
+                )
+            );
+            
+            $this->error = true;
+            return;
+        }
+        
+        $semester_id = Request::get('semester_id', null);
+        $course_name = Request::get('course_name', null);
+        $course_id = Request::get('course_id', null);
+        
+        
+        if(!$semester_id and !$course_name and !$course_id) {
+            //neither semester-ID nor course name nor course-ID are given:
+            //This must be a completely new request
+            
+            $this->course_search = new SeminarSearch();
+            
+        } elseif($semester_id) {
+            //semester-ID is given: This should have been sent via AJAX.
+            //The user wants to know the courses from that semester.
+        } elseif($semester_id and $course_name) {
+            //the user has searched for a course: This should have been sent via AJAX.
+            //Return the search results.
+        } elseif($course_id) {
+            //The search has ended: We can call the files-action with that
+            //course-ID to display all files of the course.
+            $this->redirect(
+                PluginEngine::getUrl(
+                    $this->plugin,
+                    array(
+                        'cid' => Request::get('course_id')
+                    ),
+                    'my/files'
+                )
+            );
+        }
+    }
+    
+    
     public function files_action()
     {
+        if(!Request::get('cid')) {
+            URLHelper::removeLinkParam('cid');
+        }
+        
+        if(Navigation::hasItem("/myprotectedfiles/files")) {
+            Navigation::activateItem("/myprotectedfiles/files");
+        }
+        
         PageLayout::addScript($this->plugin->getPluginURL()."/assets/jquery.tablesorter-2.22.5.js");
         if (Request::option("semester_id")) {
             $semester = Semester::find(Request::option("semester_id"));
@@ -105,7 +181,39 @@ class MyController extends PluginController {
                 $this->files[$key] = new StudipDocument();
                 $this->files[$key]->setData($row, false);
                 $this->files[$key]->setNew(false);
-                //$this->files[] = StudipDocument::build($data, false);
+            }
+        } elseif (Request::option("cid")) {
+            //user wants to see all files of a course
+            $this->course = Course::find(Request::option("cid"));
+            if(!$this->course) {
+                PageLayout::postMessage(
+                    MessageBox::error(
+                        dgettext('lizenzstatus', 'Veranstaltung nicht gefunden!')
+                    )
+                );
+                return;
+            }
+            
+            
+            $statement = DBManager::get()->prepare("
+                SELECT dokumente.*
+                FROM dokumente
+                WHERE
+                dokumente.seminar_id = :course_id
+                AND
+                dokumente.url = ''
+                ORDER BY mkdate DESC
+            ");
+            $statement->execute(array(
+                'course_id' => $this->course->id
+            ));
+            $documents_data = $statement->fetchAll(PDO::FETCH_ASSOC);
+            $this->files = array();
+            foreach ($documents_data as $key => $row) {
+                //SORM::buildExisting and SORM::build are not available in Stud.IP 2.5:
+                $this->files[$key] = new StudipDocument();
+                $this->files[$key]->setData($row, false);
+                $this->files[$key]->setNew(false);
             }
         } else {
             //StudipPDO::fetchAll isn't available in Stud.IP 2.5,
@@ -143,8 +251,17 @@ class MyController extends PluginController {
 
     public function toggle_action($dokument_id)
     {
+        global $perm;
+        $course = Course::find(Request::get('cid'));
+        
+        
         $this->file = new StudipDocument($dokument_id);
-        if ($this->file->checkAccess($GLOBALS['user']->id) && $this->file['user_id'] === $GLOBALS['user']->id) {
+        if (
+            ($this->file->checkAccess($GLOBALS['user']->id) && 
+                $this->file['user_id'] === $GLOBALS['user']->id) ||
+            ($course && $perm->have_perm('admin'))
+            )
+        {
             $this->file['protected'] = Request::int("protected", 0);
             $this->file->store();
         }
@@ -153,10 +270,17 @@ class MyController extends PluginController {
 
     public function command_action() {
         if (Request::isPost()) {
+            $course = Course::find(Request::get('cid'));
+            global $perm;
+            
             if (Request::get("action") === "delete") {
                 foreach (Request::getArray("d") as $file_id) {
                     $file = new StudipDocument($file_id);
-                    if ($file->checkAccess($GLOBALS['user']->id) && $file['user_id'] === $GLOBALS['user']->id) {
+                    if (
+                        ($file->checkAccess($GLOBALS['user']->id) &&
+                            $file['user_id'] === $GLOBALS['user']->id) ||
+                            ($course && $perm->have_perm('admin'))
+                        ){
                         $file->delete();
                     }
                 }
@@ -164,7 +288,10 @@ class MyController extends PluginController {
                 $this->redirect(
                     PluginEngine::getUrl(
                         $this->plugin,
-                        array('semester_id' => Request::option("semester_id")),
+                        array(
+                            'semester_id' => Request::option("semester_id"),
+                            'cid' => Request::get('cid')
+                        ),
                         'my/files'
                     )
                 );
@@ -173,7 +300,10 @@ class MyController extends PluginController {
                 $this->redirect(
                     PluginEngine::getUrl(
                         $this->plugin,
-                        array('semester_id' => Request::option("semester_id")),
+                        array(
+                            'semester_id' => Request::option("semester_id"),
+                            'cid' => Request::get('cid')
+                        ),
                         'my/selectlicense'
                     )
                 );
@@ -182,7 +312,10 @@ class MyController extends PluginController {
                 $this->redirect(
                     PluginEngine::getUrl(
                         $this->plugin,
-                        array('semester_id' => Request::option("semester_id")),
+                        array(
+                            'semester_id' => Request::option("semester_id"),
+                            'cid' => Request::get('cid')
+                        ),
                         'my/download'
                     )
                 );
@@ -192,10 +325,23 @@ class MyController extends PluginController {
 
     public function selectlicense_action() {
         PageLayout::setTitle(dgettext('lizenzstatus', "Ausgewählte Dateien verändern"));
+        
+        $course = Course::find(Request::get('cid'));
+        global $perm;
+        if($course and !$perm->have_perm('admin')) {
+            PageLayout::postMessage(
+                MessageBox::error(
+                    dgettext('lizenzstatus', 'Sie sind nicht dazu berechtigt, Dateien einer Veranstaltung zu ändern!')
+                )
+            );
+            return;
+        }
+        
         if (Request::isPost()) {
             foreach (Request::getArray("d") as $file) {
                 $this->file = new StudipDocument($file);
-                if ($this->file->checkAccess($GLOBALS['user']->id) && $this->file['user_id'] === $GLOBALS['user']->id) {
+                if (($this->file->checkAccess($GLOBALS['user']->id) && $this->file['user_id'] === $GLOBALS['user']->id) || 
+                    ($course and $perm->have_perm('admin'))) {
                     $this->file['protected'] = Request::int("license", 0);
                     $this->file->store();
                 }
@@ -206,6 +352,14 @@ class MyController extends PluginController {
                     $this->plugin,
                     array(
                         'semester_id' => Request::option('semester_id')
+                    ),
+                    'my/files'
+                ));
+            } elseif(Request::get('cid')) {
+                $this->redirect(PluginEngine::getUrl(
+                    $this->plugin,
+                    array(
+                        'cid' => Request::get('cid')
                     ),
                     'my/files'
                 ));
@@ -237,11 +391,15 @@ class MyController extends PluginController {
 
     public function download_action()
     {
+        global $perm;
+        $course = Course::find(Request::get('cid'));
+        
         $folder = $GLOBALS['TMP_PATH']."/".md5(uniqid());
         mkdir($folder);
         foreach ($_SESSION['DOWNLOAD_FILES'] as $file_id) {
             $datei = new StudipDocument($file_id);
-            if ($datei->checkAccess($GLOBALS['user']->id)) {
+            if (($datei->checkAccess($GLOBALS['user']->id)) ||
+                $course && $perm->have_perm('admin')) {
                 $i = "";
                 $filename_parts = explode(".", $datei['filename']);
                 if (count($filename_parts) > 1) {
@@ -263,8 +421,13 @@ class MyController extends PluginController {
         echo file_get_contents($folder.".zip");
         rmdirr($folder);
         @unlink($folder.".zip");
-        $this->response->add_header("Content-Type", "application/zip; filename=\"Meine Dateien.zip\"");
-        $this->response->add_header("Content-Disposition", "attachment; filename=\"Meine Dateien.zip\"");
+        if($course and $perm->have_perm('admin')) {
+            $this->response->add_header("Content-Type", "application/zip; filename=\"Dateien von ".$course->name. ".zip\"");
+            $this->response->add_header("Content-Disposition", "attachment; filename=\"Dateien von ".$course->name. ".zip\"");
+        } else {
+            $this->response->add_header("Content-Type", "application/zip; filename=\"Meine Dateien.zip\"");
+            $this->response->add_header("Content-Disposition", "attachment; filename=\"Meine Dateien.zip\"");
+        }
         $this->render_nothing();
     }
 
