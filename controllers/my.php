@@ -120,14 +120,11 @@ class MyController extends PluginController {
             //neither semester-ID nor course name nor course-ID are given:
             //This must be a completely new request
             
-            $this->course_search = new SeminarSearch();
+            $this->course_search = QuickSearch::get("course_id", new StandardSearch("Seminar_id"));
             
         } elseif($semester_id) {
             //semester-ID is given: This should have been sent via AJAX.
             //The user wants to know the courses from that semester.
-        } elseif($semester_id and $course_name) {
-            //the user has searched for a course: This should have been sent via AJAX.
-            //Return the search results.
         } elseif($course_id) {
             //The search has ended: We can call the files-action with that
             //course-ID to display all files of the course.

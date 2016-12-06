@@ -230,7 +230,7 @@ if(version_compare($GLOBALS['SOFTWARE_VERSION'], '3.1', '>=')) {
     if(Request::get('cid')) {
         $actions->addLink(
             dgettext('lizenzstatus', 'Zurück zu meinen Dateien'),
-            PluginEngine::getUrl($this->plugin, array(), 'my/reset'),
+            PluginEngine::getUrl($plugin, array(), 'my/reset'),
             version_compare($GLOBALS['SOFTWARE_VERSION'], "3.4", ">=")
                 ? Icon::create('headache', 'clickable')
                 : Assets::image_path('icons/16/blue/headache')
@@ -276,6 +276,11 @@ if(version_compare($GLOBALS['SOFTWARE_VERSION'], '3.1', '>=')) {
         . '" >' . Assets::img('icons/16/blue/download', array('size' => '16'))
         . dgettext('lizenzstatus', 'Ausgewählte Dateien herunterladen.') . '</a><br>';
 
+    if(Request::get('cid')) {
+        $actions_links .= '<a href="' . PluginEngine::getLink($plugin, array(), 'my/reset') . '" >'
+            . Assets::img('icons/16/blue/headache', array('class' => 'text-bottom'))
+            . dgettext('lizenzstatus', 'Zurück zu meinen Dateien') . '</a><br>';
+    }
 
     $semesters = array_reverse(Semester::getAll());
 
