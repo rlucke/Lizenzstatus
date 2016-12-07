@@ -1,3 +1,4 @@
+<p><?= dgettext('lizenzstatus', 'Auf dieser Seite können Veranstaltungen entweder anhand deren Namen und einem Semester oder anhand deren Einrichtung und einem Semester gesucht werden.') ?></p>
 <? if (!$error): ?>
 <form name="courseSearch" action="" method="post" class="default">
     <fieldset>
@@ -22,9 +23,45 @@
                 <? endforeach ?>
             </select>
         </label>
+        <br>
+        <?= \Studip\Button::create(dgettext('lizenzstatus', 'Suchen')) ?>
     </fieldset>
-    <?= \Studip\Button::create(dgettext('lizenzstatus', 'Suchen')) ?>
 </form>
+<? if ($available_institutes): ?>
+<form name="instituteSearch" action="" method="post" class="default">
+    <fieldset>
+        <legend><?= dgettext('lizenzstatus', 'Suche nach Einrichtungen'); ?></legend>
+        <label>
+            <?= dgettext('lizenzstatus', 'Einrichtung') . ':'; ?>
+            <select name="institute_id" value="<?= htmlReady($available_institutes[0]['id']) ?>">
+                <? foreach($available_institutes as $institute) : ?>
+                    <option value="<?= htmlReady($institute['id']) ?>"
+                        <?= ($selected_institute_id == $institute['id']) ? 'selected="selected"' : '' ?>>
+                        <?= htmlReady($institute['name']) ?>
+                    </option>
+                <? endforeach ?>
+            </select>
+        </label>
+        <label>
+            <?= dgettext('lizenzstatus', 'Semester') . ':'; ?>
+            <select name="semester_id">
+                <option value=""
+                    <?= ($selected_semester_id == '') ? 'selected="selected"' : '' ?>>
+                    <?= dgettext('lizenzstatus', 'alle') ?>
+                </option>
+                <? foreach($available_semesters as $semester) : ?>
+                <option value="<?= htmlReady($semester['id']) ?>"
+                    <?= ($selected_semester_id == $semester['id']) ? 'selected="selected"' : '' ?>>
+                    <?= htmlReady($semester['name']) ?>
+                </option>
+                <? endforeach ?>
+            </select>
+        </label>
+        <br>
+        <?= \Studip\Button::create(dgettext('lizenzstatus', 'Suchen')) ?>
+    </fieldset>
+</form>
+<? endif ?>
 <? if($search_was_executed): ?>
 <table class="default">
     <caption><?= dgettext('lizenzstatus', 'Suchergebnisse') ?></caption>

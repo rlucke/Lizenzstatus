@@ -22,10 +22,11 @@
                 <th><a><?= dgettext('lizenzstatus', "Dateiname") ?></a></th>
                 <? if ($course): ?>
                 <th><a><?= dgettext('lizenzstatus', 'Nutzer') ?></a></th>
+                <th><a><?= dgettext('lizenzstatus', 'Lehrende') ?></a></th>
                 <? else: ?>
                 <th><a><?= dgettext('lizenzstatus', "Veranstaltung") ?></a></th>
-                <th><a><?= dgettext('lizenzstatus', "Semester") ?></a></th>
                 <? endif ?>
+                <th><a><?= dgettext('lizenzstatus', "Semester") ?></a></th>
                 <th><a><?= dgettext('lizenzstatus', "Datum") ?></a></th>
                 <th><a><?= dgettext('lizenzstatus', "Lizenzstatus") ?></a></th>
             </tr>
@@ -71,6 +72,23 @@
                             <?= htmlReady($file_user ? $file_user->getFullName() : dgettext('lizenzstatus', 'unbekannt')) ?>
                         </a>
                     </td>
+                    <td>
+                        <a href="<?= URLHelper::getLink("folder.php#anker", array(
+                            'user_id' => $file['user_id'],
+                            'data' => array(
+                                'cmd' => "tree",
+                                'open' => array(
+                                    $file['range_id'] => 1,
+                                    $file->getId() => 1
+                                )
+                            ),
+                            'open' => $file->getId()
+                        )) ?>">
+                        <? $file_user = User::find($file->user_id); ?>
+
+                            <?= htmlReady($file_user ? $file_user->getFullName() : dgettext('lizenzstatus', 'unbekannt')) ?>
+                        </a>
+                    </td>
                 <? else: ?>
                     <td>
                         <a href="<?= URLHelper::getLink("folder.php#anker", array(
@@ -89,21 +107,21 @@
                             <?= htmlReady($file_course ? $file_course->name : $file->institute->name) ?>
                         </a>
                     </td>
-                    <? if ($file_course) : ?>
-                    <td data-timestamp="<?= htmlReady($file_course->start_semester->beginn) ?>">
-                        <?= htmlReady($file_course->start_semester->name) ?>
-                        <? if ($file_course['duration_time'] != 0) : ?>
-                            -
-                            <? if ($file_course['duration_time'] == -1) : ?>
-                                <?= dgettext('lizenzstatus', "unbegrenzt") ?>
-                            <? else : ?>
-                                <?= htmlReady($file_course->end_semester->name) ?>
-                            <? endif ?>
+                <? endif ?>
+                <? if ($file_course) : ?>
+                <td data-timestamp="<?= htmlReady($file_course->start_semester->beginn) ?>">
+                    <?= htmlReady($file_course->start_semester->name) ?>
+                    <? if ($file_course['duration_time'] != 0) : ?>
+                        -
+                        <? if ($file_course['duration_time'] == -1) : ?>
+                            <?= dgettext('lizenzstatus', "unbegrenzt") ?>
+                        <? else : ?>
+                            <?= htmlReady($file_course->end_semester->name) ?>
                         <? endif ?>
-                    </td>
-                    <? else : ?>
-                        <td data-timestamp="0">-</td>
                     <? endif ?>
+                </td>
+                <? else : ?>
+                    <td data-timestamp="0">-</td>
                 <? endif ?>
                 <td data-timestamp="<?= htmlReady($file['mkdate']) ?>">
                     <?= date("d.m.Y H:i", $file['mkdate'])." ".dgettext('lizenzstatus', "Uhr") ?>

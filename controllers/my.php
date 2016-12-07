@@ -113,6 +113,7 @@ class MyController extends PluginController {
         }
         
         $this->semester_id = Request::get('semester_id', '');
+        $this->institute_id = Request::get('institute_id', '');
         $this->criteria = Request::get('criteria', null);
         $this->selected_semester_id = $this->semester_id;
         
@@ -120,19 +121,59 @@ class MyController extends PluginController {
         //semester selector is always filled:
         $this->available_semesters = Semester::getAll();
         
+        $this->available_institutes = Institute::findBySql(
+            "INNER JOIN user_inst
+            ON
+            Institute.institut_id = user_inst.institut_id
+            WHERE
+            user_inst.user_id = :user_id
+            ORDER BY name ASC",
+            array(
+                'user_id' => User::findCurrent()->id
+            )
+        );
         
-        if($this->semester_id or $this->criteria) {
+        
+        if($this->criteria) {
             //semester-ID or criteria (or both) are given:
             //The user wants to know the courses from the specified semester
             //which have a certain name.
             
+            $current_user = User::findCurrent();
             
-            if($this->criteria and $this->semester_id) {
-                //semester and course name selected
+            $institute_memberships = $current_user->institute_memberships;
+            
+            $institute_id_list = array();
+            
+            if($institute_memberships) {
+                
+                foreach($institute_memberships as $membership) {
+                    $institute = $membership->institute;
+                    
+                    $institute_id_list[] = $institute->id;
+                    
+                    if($institute->is_fak) {
+                        //for facultys, we must also look at the courses from
+                        //institutes inside the faculty:
+                        $sub_institutes = Institute::findByFakultaets_id($institute->id);
+                        
+                        foreach($sub_institutes as $sub_institute) {
+                            $institute_id_list[] = $sub_institute->id;
+                        }
+                    }
+                }
+            }
+            
+            $institute_id_list = array_unique($institute_id_list);
+            
+            
+            if($this->semester_id) {
+                //course name selected
                 
                 $semester = Semester::find($this->semester_id);
                 
                 if($semester) {
+                    //...and semester selected
                     $this->courses = Course::findBySql(
                         "(
                             seminare.start_time = :semester_start_time
@@ -142,49 +183,91 @@ class MyController extends PluginController {
                         AND
                         (name LIKE CONCAT('%', :criteria, '%')
                         OR untertitel LIKE CONCAT('%', :criteria, '%')
-                        OR beschreibung LIKE CONCAT('%', :criteria, '%')) ",
+                        OR beschreibung LIKE CONCAT('%', :criteria, '%')) "
+                        . (($institute_id_list)
+                          ? "AND (seminare.institut_id in ( :institute_id_list )) "
+                          : "")
+                        . "ORDER BY seminare.name ASC",
                         array(
                             'semester_start_time' => $semester->beginn,
-                            'criteria' => $this->criteria
+                            'criteria' => $this->criteria,
+                            'institute_id_list' => $institute_id_list
                         )
                     );
                 }
                 
-                $this->search_was_executed = true;
-            } elseif($this->semester_id and !$this->criteria) {
-                //semester and no course name selected
-                $this->courses = Course::findBySql(
-                    "(start_time = :semester_id) ",
-                    array(
-                        'semester_id' => $this->semester_id
-                    )
-                );
-                $this->search_was_executed = true;
             } else {
                 //no semester selected
                 $this->courses = Course::findBySql(
                     "(name LIKE CONCAT('%', :criteria, '%')
                     OR untertitel LIKE CONCAT('%', :criteria, '%')
-                    OR beschreibung LIKE CONCAT('%', :criteria, '%')) ",
+                    OR beschreibung LIKE CONCAT('%', :criteria, '%')) "
+                    . (($institute_id_list)
+                        ? "AND (seminare.institut_id in ( :institute_id_list )) "
+                        : "")
+                    . " ORDER BY name ASC",
                     array(
-                        'criteria' => $this->criteria
+                        'criteria' => $this->criteria,
+                        'institute_id_list' => $institute_id_list
                     )
                 );
-                $this->search_was_executed = true;
             }
             
-        } elseif($this->course_id) {
-            //The search has ended: We can call the files-action with that
-            //course-ID to display all files of the course.
-            $this->redirect(
-                PluginEngine::getUrl(
-                    $this->plugin,
-                    array(
-                        'cid' => Request::get('course_id')
-                    ),
-                    'my/files'
-                )
-            );
+            $this->search_was_executed = true;
+            
+        } elseif($this->institute_id) {
+            //The user wants to get all courses of an institute:
+            $institute = Institute::find($this->institute_id);
+            
+            if($institute) {
+                
+                $institute_id_list = array($institute->id);
+                
+                if($institute->is_fak) {
+                    //for facultys, we must also look at the courses from
+                    //institutes inside the faculty:
+                    $sub_institutes = Institute::findByFakultaets_id($institute->id);
+                    
+                    foreach($sub_institutes as $sub_institute) {
+                        $institute_id_list[] = $sub_institute->id;
+                    }
+                }
+                
+                
+                $this->selected_institute_id = $this->institute_id;
+                
+                if($this->semester_id) {
+                    //...and semester selected
+                    $semester = Semester::find($this->semester_id);
+                    
+                    if($semester) {
+                        $this->courses = Course::findBySql(
+                            "(
+                                seminare.start_time = :semester_start_time
+                                OR (seminare.start_time < :semester_start_time AND seminare.duration_time = -1)
+                                OR (seminare.start_time < :semester_start_time AND seminare.start_time + seminare.duration_time >= :semester_start_time)
+                            )
+                            AND
+                            (institut_id in ( :institute_id_list ))
+                            ORDER BY seminare.name ASC",
+                            array(
+                                'semester_start_time' => $semester->beginn,
+                                'institute_id_list' => $institute_id_list
+                            )
+                        );
+                    }
+                } else {
+                    //no semester selected
+                    $this->courses = Course::findBySql(
+                        'institut_id IN ( :institute_id_list ) ORDER BY name ASC',
+                        array(
+                            'institute_id_list' => $institute_id_list
+                        )
+                    );
+                }
+            }
+            
+            $this->search_was_executed = true;
         }
     }
     
