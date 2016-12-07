@@ -23,7 +23,7 @@
             </select>
         </label>
     </fieldset>
-    <?= \StudIP\Button::create(dgettext('lizenzstatus', 'Suchen')) ?>
+    <?= \Studip\Button::create(dgettext('lizenzstatus', 'Suchen')) ?>
 </form>
 <? if($search_was_executed): ?>
 <table class="default">
