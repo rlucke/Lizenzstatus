@@ -65,6 +65,13 @@
 <? if($search_was_executed): ?>
 <table class="default">
     <caption><?= dgettext('lizenzstatus', 'Suchergebnisse') ?></caption>
+    <thead>
+        <tr>
+            <th><?= dgettext('lizenzstatus', 'Name der Veranstaltung') ?></th>
+            <th><?= dgettext('lizenzstatus', 'Lehrende') ?></th>
+            <th><?= dgettext('lizenzstatus', 'Semester') ?></th>
+        </tr>
+    </thead>
     <tbody>
     <? if($courses): ?>
         <? foreach ($courses as $course): ?>
@@ -79,6 +86,17 @@
                 ) ?>"><?= (version_compare($GLOBALS['SOFTWARE_VERSION'], '3.1', '>='))
                     ? htmlReady($course->getFullName())
                     : htmlReady($course->name) ?></a>
+            </td>
+            <td>
+                <? $course_members = CourseMember::findByCourseAndStatus($course->id, 'dozent'); ?>
+                <? if($course_members): ?>
+                <? foreach($course_members as $member): ?>
+                <?= htmlReady($member->user->getFullName()) ?>
+                <? endforeach ?>
+                <? endif ?>
+            </td>
+            <td>
+                <?= ($course->start_semester) ? $course->start_semester->name : '' ?>
             </td>
         </tr>
         <? endforeach ?>
