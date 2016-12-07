@@ -64,7 +64,7 @@
 <? endif ?>
 <? if($search_was_executed): ?>
 <table class="default">
-    <caption><?= dgettext('lizenzstatus', 'Suchergebnisse') ?></caption>
+    <caption><?= dgettext('lizenzstatus', 'Suchergebnisse') ?>&nbsp;(<?=count($courses)?>)</caption>
     <thead>
         <tr>
             <th><?= dgettext('lizenzstatus', 'Name der Veranstaltung') ?></th>
@@ -91,7 +91,7 @@
                 <? $course_members = CourseMember::findByCourseAndStatus($course->id, 'dozent'); ?>
                 <? if($course_members): ?>
                 <? foreach($course_members as $member): ?>
-                <?= htmlReady($member->user->getFullName()) ?>
+                <?= htmlReady($member->getUserFullName('short')) ?>
                 <? endforeach ?>
                 <? endif ?>
             </td>
