@@ -117,11 +117,7 @@ class MyController extends PluginController {
         
         
         //semester selector is always filled:
-        if (version_compare($GLOBALS['SOFTWARE_VERSION'], '3.2', '>=')) {
-            $this->available_semesters = Semester::getAll();
-        } else {
-            $this->available_semesters = SemesterData::getAllSemesterData();
-        }
+        $this->available_semesters = Semester::getAll();
         
         
         if($this->semester_id or $this->criteria) {
