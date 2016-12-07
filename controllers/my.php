@@ -232,6 +232,7 @@ class MyController extends PluginController {
             }
         } elseif (Request::option("cid")) {
             //user wants to see all files of a course
+            
             $this->course = Course::find(Request::option("cid"));
             if(!$this->course) {
                 PageLayout::postMessage(
@@ -241,7 +242,6 @@ class MyController extends PluginController {
                 );
                 return;
             }
-            
             
             $statement = DBManager::get()->prepare("
                 SELECT dokumente.*

@@ -239,21 +239,23 @@ if(version_compare($GLOBALS['SOFTWARE_VERSION'], '3.1', '>=')) {
     
     Sidebar::Get()->addWidget($actions);
 
-    $semester_select = new SelectWidget(
-        dgettext('lizenzstatus', "Nach Semester filtern"),
-        PluginEngine::getLink($plugin, array(), "my/files"),
-        "semester_id"
-    );
-    $semesters = array_reverse(Semester::getAll());
-    $semester_select->addElement(new SelectElement("", dgettext('lizenzstatus', "Alle"), false));
-    foreach ($semesters as $semester) {
-        $semester_select->addElement(new SelectElement(
-            $semester->getId(),
-            $semester['name'],
-            Request::get("semester_id") === $semester->getId()
-        ));
+    if(!Request::get('cid')) {
+        $semester_select = new SelectWidget(
+            dgettext('lizenzstatus', "Nach Semester filtern"),
+            PluginEngine::getLink($plugin, array(), "my/files"),
+            "semester_id"
+        );
+        $semesters = array_reverse(Semester::getAll());
+        $semester_select->addElement(new SelectElement("", dgettext('lizenzstatus', "Alle"), false));
+        foreach ($semesters as $semester) {
+            $semester_select->addElement(new SelectElement(
+                $semester->getId(),
+                $semester['name'],
+                Request::get("semester_id") === $semester->getId()
+            ));
+        }
+        Sidebar::Get()->addWidget($semester_select);
     }
-    Sidebar::Get()->addWidget($semester_select);
 } else {
     //code for Stud.IP 2.5 and 3.0:
 
@@ -282,25 +284,27 @@ if(version_compare($GLOBALS['SOFTWARE_VERSION'], '3.1', '>=')) {
             . dgettext('lizenzstatus', 'Zurück zu meinen Dateien') . '</a><br>';
     }
 
-    $semesters = array_reverse(Semester::getAll());
+    if(!Request::get('cid')) {
+        $semesters = array_reverse(Semester::getAll());
 
-    $semester_select = '<form novalidate="novalidate" action="'
-        . PluginEngine::getLink($plugin, array(), 'my/files')
-        . '" method="get"><select name="semester_id" onchange="$(this).closest(\'form\').submit();">';
+        $semester_select = '<form novalidate="novalidate" action="'
+            . PluginEngine::getLink($plugin, array(), 'my/files')
+            . '" method="get"><select name="semester_id" onchange="$(this).closest(\'form\').submit();">';
 
-    $semester_select .= '<option value="" '
-            . (!Request::get('semester_id') ? 'selected="selected"' : '' )
-            . '>' . dgettext('lizenzstatus', 'Alle') . '</option>';
+        $semester_select .= '<option value="" '
+                . (!Request::get('semester_id') ? 'selected="selected"' : '' )
+                . '>' . dgettext('lizenzstatus', 'Alle') . '</option>';
 
-    foreach($semesters as $semester) {
-        $semester_select .= '<option value="'. $semester['id'] .'"'
-            . ((Request::get('semester_id') === $semester['id']) ? 'selected="selected"' : '' )
-            . '>' . $semester['name'] . '</option>';
+        foreach($semesters as $semester) {
+            $semester_select .= '<option value="'. $semester['id'] .'"'
+                . ((Request::get('semester_id') === $semester['id']) ? 'selected="selected"' : '' )
+                . '>' . $semester['name'] . '</option>';
+        }
+
+        $semester_select .= '</select><br><noscript>
+            <button type="submit" class="button" name="Zuweisen">' . dgettext('lizenzstatus', 'Zuweisen')
+            . '</button></noscript></form>';
     }
-
-    $semester_select .= '</select><br><noscript>
-        <button type="submit" class="button" name="Zuweisen">' . dgettext('lizenzstatus', 'Zuweisen')
-        . '</button></noscript></form>';
 
 
     $infobox = array(
