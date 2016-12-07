@@ -48,12 +48,11 @@ class Lizenzstatus extends StudIPPlugin implements SystemPlugin {
         
         global $perm;
         if($perm->have_perm('admin')) {
-            //only admins need tabs:
+            //This feature is only available for admins:
             $subnav = new Navigation(dgettext('lizenzstatus', 'Dateien'));
             $subnav->setURL(PluginEngine::getURL($this, array(), 'my/files'));
             $nav->addSubNavigation('files', $subnav);
-            
-        
+                    
             $subnav = new Navigation(dgettext('lizenzstatus', 'Suche nach Veranstaltungen'));
             $subnav->setUrl(PluginEngine::getURL($this, array(), 'my/search'));
             $nav->addSubNavigation('search', $subnav);

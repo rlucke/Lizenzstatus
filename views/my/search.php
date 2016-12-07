@@ -39,7 +39,9 @@
                         'cid' => $course->id
                     ),
                     'my/files'
-                ) ?>"><?= htmlReady($course->getFullName()) ?></a>
+                ) ?>"><?= (version_compare($GLOBALS['SOFTWARE_VERSION'], '3.1', '>='))
+                    ? htmlReady($course->getFullName())
+                    : htmlReady($course->name) ?></a>
             </td>
         </tr>
         <? endforeach ?>

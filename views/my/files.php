@@ -279,7 +279,7 @@ if(version_compare($GLOBALS['SOFTWARE_VERSION'], '3.1', '>=')) {
         . dgettext('lizenzstatus', 'Ausgewählte Dateien herunterladen.') . '</a><br>';
 
     if(Request::get('cid')) {
-        $actions_links .= '<a href="' . PluginEngine::getLink($plugin, array(), 'my/reset') . '" >'
+        $action_links .= '<a href="' . PluginEngine::getLink($plugin, array(), 'my/reset') . '" >'
             . Assets::img('icons/16/blue/headache', array('class' => 'text-bottom'))
             . dgettext('lizenzstatus', 'Zurück zu meinen Dateien') . '</a><br>';
     }
@@ -319,16 +319,17 @@ if(version_compare($GLOBALS['SOFTWARE_VERSION'], '3.1', '>=')) {
                     )
                 )
             ),
-
-            array(
-                'kategorie' => dgettext('lizenzstatus', 'Nach Semester filtern:'),
-                'eintrag' => array(
-                    array(
-                        'icon' => 'icons/16/black/info.png',
-                        'text' => $semester_select
-                    )
-                )
-            )
         )
     );
+    if(!Request::get('cid')) {
+        $infobox['content'][] = array(
+            'kategorie' => dgettext('lizenzstatus', 'Nach Semester filtern:'),
+            'eintrag' => array(
+                array(
+                    'icon' => 'icons/16/black/info.png',
+                    'text' => $semester_select
+                )
+            )
+        );
+    }
 }
