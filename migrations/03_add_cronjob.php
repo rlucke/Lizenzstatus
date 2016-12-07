@@ -51,11 +51,11 @@ class AddCronjob extends Migration {
             
             $db->exec(
                 "INSERT INTO `cronjobs_schedules`
-                (`schedule_id`, `task_id`, `parameters`, `priority`,
+                (`schedule_id`, `task_id`, `active`, `parameters`, `priority`,
                 `type`, `next_execution`, `mkdate`, `chdate`, `last_result`)
                 VALUES
                 ('".$schedule_id."', '"
-                .$this->cronjob_md5."', '[]', '".self::$cronjob['priority']
+                .$this->cronjob_md5."', '1', '[]', '".self::$cronjob['priority']
                 ."', 'once', '".self::$cronjob['execution_timestamp']
                 ."', UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), NULL)"
             );
