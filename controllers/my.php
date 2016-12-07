@@ -138,14 +138,9 @@ class MyController extends PluginController {
                 if($semester) {
                     $this->courses = Course::findBySql(
                         "(
-                            (:semester_start_time <= start_time 
-                            AND :semester_end_time >= (start_time + duration_time))
-                        OR
-                            (:semester_start_time < (start_time + duration_time)
-                            AND :semester_end_time >= (start_time + duration_time))
-                        OR
-                            (:semester_start_time <= start_time
-                            AND :semester_end_time > start_time)
+                            seminare.start_time = :semester_start_time
+                            OR (seminare.start_time < :semester_start_time AND seminare.duration_time = -1)
+                            OR (seminare.start_time < :semester_start_time AND seminare.start_time + seminare.duration_time >= :semester_start_time)
                         )
                         AND
                         (name LIKE CONCAT('%', :criteria, '%')
@@ -153,7 +148,6 @@ class MyController extends PluginController {
                         OR beschreibung LIKE CONCAT('%', :criteria, '%')) ",
                         array(
                             'semester_start_time' => $semester->beginn,
-                            'semester_end_time' => $semester->ende,
                             'criteria' => $this->criteria
                         )
                     );
