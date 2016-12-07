@@ -11,6 +11,7 @@
  *  the License, or (at your option) any later version.
  */
 
+require_once 'lib/classes/CronJob.class.php';
 
 class NewYear2017Cronjob extends CronJob
 {
@@ -42,6 +43,7 @@ class NewYear2017Cronjob extends CronJob
     {
         global $STUDIP_BASE_PATH;
         require_once($STUDIP_BASE_PATH . '/lib/classes/Config.class.php');
+        require_once($STUDIP_BASE_PATH . '/config/config_local.inc.php');
     }
     
     
@@ -59,10 +61,12 @@ class NewYear2017Cronjob extends CronJob
      */
     public function execute($last_result, $parameters = array())
     {
+        
         //get db connection:
         $db = DBManager::get();
         
-        $license_changes = Config::get()->DOCUMENT_LICENSE_CHANGES_2017;
+        
+        $license_changes = Config::Get()->DOCUMENT_LICENSE_CHANGES_2017;
         
         if(!is_array($license_changes)) {
             //Configuration parameter wasn't set in config_local.inc.php:
