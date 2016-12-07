@@ -18,7 +18,7 @@ class AddCronjob extends Migration {
             'filename' => 'public/plugins_packages/data-quest/Lizenzstatus/NewYear2017Cronjob.class.php',
             'class' => 'NewYear2017Cronjob',
             'priority' => 'normal',
-            'minute' => '-1'
+            'execution_timestamp' => '1483225200' //2017-01-01 0:00 MEZ (UTC+0100)
     );
     
     public function __construct()
@@ -27,7 +27,7 @@ class AddCronjob extends Migration {
             self::$cronjob['filename'] .
             self::$cronjob['class'] .
             self::$cronjob['priority'] .
-            self::$cronjob['minute']
+            self::$cronjob['execution_timestamp']
         );
         
         parent::__construct();
@@ -52,11 +52,11 @@ class AddCronjob extends Migration {
             $db->exec(
                 "INSERT INTO `cronjobs_schedules`
                 (`schedule_id`, `task_id`, `parameters`, `priority`,
-                `type`, `minute`, `mkdate`, `chdate`, `last_result`)
+                `type`, `next_execution`, `mkdate`, `chdate`, `last_result`)
                 VALUES
                 ('".$schedule_id."', '"
                 .$this->cronjob_md5."', '[]', '".self::$cronjob['priority']
-                ."', 'once', '".self::$cronjob['minute']
+                ."', 'once', '".self::$cronjob['execution_timestamp']
                 ."', UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), NULL)"
             );
             

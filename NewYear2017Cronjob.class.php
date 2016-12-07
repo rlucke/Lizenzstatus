@@ -74,16 +74,26 @@ class NewYear2017Cronjob extends CronJob
         }
         
         //execute queries:
+        $statement = $db->prepare(
+            "UPDATE document_licenses set protected = :protection_state
+            WHERE license_id = :license_id"
+        );
         
         foreach($license_changes as $license_id => $protection_state) {
-            $db->exec(
-                "UPDATE document_licenses set protected = :protection_state
-                WHERE license_id = :license_id",
+            echo 'Updating license with ID ' . $license_id . "...\n";
+            $result = $statement->execute(
                 array(
                     'protection_state' => $protection_state,
                     'license_id' => $license_id
                 )
             );
+            
+            if($result === false) {
+                //error while updating:
+                echo 'ERROR while updating license-ID ' . $license_id . ' to protection state ' . $protection_state . "!\n";
+            } else {
+                echo 'Updated license-ID ' . $license_id . ' to protection state ' . $protection_state . "!\n";
+            }
         }
         
         //close db connection:
