@@ -3,6 +3,7 @@
 require_once __DIR__.'/../Lizenzstatus.class.php';
 require_once 'lib/classes/PageLayout.php';
 require_once 'lib/classes/searchtypes/SeminarSearch.class.php';
+require_once 'lib/datei.inc.php';
 
 
 //for Stud.IP 2.5 compatibility:
@@ -435,36 +436,13 @@ class MyController extends PluginController {
 
     public function download_action()
     {
-        global $perm;
+        global $perm, $TMP_PATH;
         $course = Course::find(Request::get('cid'));
         
-        $folder = $GLOBALS['TMP_PATH']."/".md5(uniqid());
-        mkdir($folder);
-        foreach ($_SESSION['DOWNLOAD_FILES'] as $file_id) {
-            $datei = new StudipDocument($file_id);
-            if (($datei->checkAccess($GLOBALS['user']->id)) ||
-                $course && $perm->have_perm('admin')) {
-                $i = "";
-                $filename_parts = explode(".", $datei['filename']);
-                if (count($filename_parts) > 1) {
-                    $ending = array_pop($filename_parts);
-                } else {
-                    $ending = "";
-                }
-                $name = implode(".", $filename_parts);
-                $filename = $folder."/".$name.($i ? "(".$i.")" : "").($ending ? ".".$ending : "");
-                while (file_exists($filename)) {
-                    $i++;
-                    $filename = $folder."/".$name.($i ? "(".$i.")" : "").($ending ? ".".$ending : "");
-                }
-                copy(get_upload_file_path($file_id), $filename);
-            }
-        }
-        unset($_SESSION['DOWNLOAD_FILES']);
-        create_zip_from_directory($folder, $folder.".zip");
-        echo file_get_contents($folder.".zip");
-        rmdirr($folder);
-        @unlink($folder.".zip");
+        $zipfile_id = createSelectedZip($_SESSION['DOWNLOAD_FILES']);
+        
+        echo file_get_contents($TMP_PATH.'/'.$zipfile_id);
+        @unlink($TMP_PATH.'/'.$zipfile_id);
         if($course and $perm->have_perm('admin')) {
             $this->response->add_header("Content-Type", "application/zip; filename=\"Dateien von ".$course->name. ".zip\"");
             $this->response->add_header("Content-Disposition", "attachment; filename=\"Dateien von ".$course->name. ".zip\"");
