@@ -111,21 +111,78 @@ class MyController extends PluginController {
             return;
         }
         
-        $semester_id = Request::get('semester_id', null);
-        $course_name = Request::get('course_name', null);
-        $course_id = Request::get('course_id', null);
+        $this->semester_id = Request::get('semester_id', '');
+        $this->criteria = Request::get('criteria', null);
+        $this->selected_semester_id = $this->semester_id;
         
         
-        if(!$semester_id and !$course_name and !$course_id) {
-            //neither semester-ID nor course name nor course-ID are given:
-            //This must be a completely new request
+        //semester selector is always filled:
+        if (version_compare($GLOBALS['SOFTWARE_VERSION'], '3.2', '>=')) {
+            $this->available_semesters = Semester::getAll();
+        } else {
+            $this->available_semesters = SemesterData::getAllSemesterData();
+        }
+        
+        
+        if($this->semester_id or $this->criteria) {
+            //semester-ID or criteria (or both) are given:
+            //The user wants to know the courses from the specified semester
+            //which have a certain name.
             
-            $this->course_search = QuickSearch::get("course_id", new StandardSearch("Seminar_id"));
             
-        } elseif($semester_id) {
-            //semester-ID is given: This should have been sent via AJAX.
-            //The user wants to know the courses from that semester.
-        } elseif($course_id) {
+            if($this->criteria and $this->semester_id) {
+                //semester and course name selected
+                
+                $semester = Semester::find($this->semester_id);
+                
+                if($semester) {
+                    $this->courses = Course::findBySql(
+                        "(
+                            (:semester_start_time <= start_time 
+                            AND :semester_end_time >= (start_time + duration_time))
+                        OR
+                            (:semester_start_time < (start_time + duration_time)
+                            AND :semester_end_time >= (start_time + duration_time))
+                        OR
+                            (:semester_start_time <= start_time
+                            AND :semester_end_time > start_time)
+                        )
+                        AND
+                        (name LIKE CONCAT('%', :criteria, '%')
+                        OR untertitel LIKE CONCAT('%', :criteria, '%')
+                        OR beschreibung LIKE CONCAT('%', :criteria, '%')) ",
+                        array(
+                            'semester_start_time' => $semester->beginn,
+                            'semester_end_time' => $semester->ende,
+                            'criteria' => $this->criteria
+                        )
+                    );
+                }
+                
+                $this->search_was_executed = true;
+            } elseif($this->semester_id and !$this->criteria) {
+                //semester and no course name selected
+                $this->courses = Course::findBySql(
+                    "(start_time = :semester_id) ",
+                    array(
+                        'semester_id' => $this->semester_id
+                    )
+                );
+                $this->search_was_executed = true;
+            } else {
+                //no semester selected
+                $this->courses = Course::findBySql(
+                    "(name LIKE CONCAT('%', :criteria, '%')
+                    OR untertitel LIKE CONCAT('%', :criteria, '%')
+                    OR beschreibung LIKE CONCAT('%', :criteria, '%')) ",
+                    array(
+                        'criteria' => $this->criteria
+                    )
+                );
+                $this->search_was_executed = true;
+            }
+            
+        } elseif($this->course_id) {
             //The search has ended: We can call the files-action with that
             //course-ID to display all files of the course.
             $this->redirect(
