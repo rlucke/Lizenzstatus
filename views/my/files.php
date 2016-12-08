@@ -249,7 +249,7 @@ if(version_compare($GLOBALS['SOFTWARE_VERSION'], '3.1', '>=')) {
     
     Sidebar::Get()->addWidget($actions);
 
-    if(!Request::get('cid')) {
+    if(!Request::get('cid') and !Request::get('user_id')) {
         $semester_select = new SelectWidget(
             dgettext('lizenzstatus', "Nach Semester filtern"),
             PluginEngine::getLink($plugin, array(), "my/files"),
@@ -294,7 +294,7 @@ if(version_compare($GLOBALS['SOFTWARE_VERSION'], '3.1', '>=')) {
             . dgettext('lizenzstatus', 'Zurück zu meinen Dateien') . '</a><br>';
     }
 
-    if(!Request::get('cid')) {
+    if(!Request::get('cid') and !Request::get('user_id')) {
         $semesters = array_reverse(Semester::getAll());
 
         $semester_select = '<form novalidate="novalidate" action="'

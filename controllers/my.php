@@ -95,7 +95,9 @@ class MyController extends PluginController {
         if(Navigation::hasItem("/myprotectedfiles/search_user")) {
             Navigation::activateItem("/myprotectedfiles/search_user");
         }
-
+        
+        URLHelper::removeLinkParam('cid');
+        
         global $perm;
 
         if(!$perm->have_perm('admin')) {
@@ -147,6 +149,8 @@ class MyController extends PluginController {
         if(Navigation::hasItem("/myprotectedfiles/search")) {
             Navigation::activateItem("/myprotectedfiles/search");
         }
+        
+        URLHelper::removeLinkParam('user_id');
 
         global $perm;
 
