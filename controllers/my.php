@@ -587,8 +587,8 @@ class MyController extends PluginController {
         $course = Course::find(Request::get('cid'));
         $user = User::find(Request::get('user_id'));
         
-        
         global $perm;
+        
         if($course and !$perm->have_perm('admin')) {
             PageLayout::postMessage(
                 MessageBox::error(
@@ -631,7 +631,7 @@ class MyController extends PluginController {
                 $params['semester_id'] = Request::option('semester_id');
             }
             
-            /*
+            
             if($course) {
                 $params['cid'] = $course->id;
             }
@@ -639,7 +639,7 @@ class MyController extends PluginController {
             if($user) {
                 $params['user_id'] = $user->id;
             }
-            */
+            
             
             $this->redirect(PluginEngine::getUrl(
                 $this->plugin,
