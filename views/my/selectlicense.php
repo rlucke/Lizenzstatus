@@ -1,5 +1,7 @@
 <form class="<?= $formclass ?>" action="<?= PluginEngine::getLink($plugin, array(), "my/selectlicense") ?>" method="post">
     <input type="hidden" name="semester_id" value="<?= htmlReady(Request::option("semester_id")) ?>">
+    <input type="hidden" name="cid" value="<?= htmlReady(Request::option("cid")) ?>">
+    <input type="hidden" name="user_id" value="<?= htmlReady(Request::option("user_id")) ?>">
     <? foreach ($files as $file) : ?>
         <input type="hidden" name="d[]" value="<?= htmlReady($file) ?>">
     <? endforeach ?>

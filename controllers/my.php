@@ -4,6 +4,7 @@ require_once __DIR__.'/../Lizenzstatus.class.php';
 require_once 'lib/classes/PageLayout.php';
 require_once 'lib/classes/searchtypes/SeminarSearch.class.php';
 require_once 'lib/datei.inc.php';
+require_once 'lib/models/StudipDocument.class.php';
 
 
 //for Stud.IP 2.5 compatibility:
@@ -82,10 +83,64 @@ class MyController extends PluginController {
     public function reset_action()
     {
         URLHelper::removeLinkParam('cid');
+        URLHelper::removeLinkParam('user_id');
 
         $this->redirect(PluginEngine::getURL($this->plugin, array(), 'my/files'));
     }
 
+    
+    public function search_user_action()
+    {
+        Navigation::activateItem("/myprotectedfiles");
+        if(Navigation::hasItem("/myprotectedfiles/search_user")) {
+            Navigation::activateItem("/myprotectedfiles/search_user");
+        }
+
+        global $perm;
+
+        if(!$perm->have_perm('admin')) {
+            PageLayout::postMessage(
+                MessageBox::error(
+                    dgettext('lizenzstatus', 'Sie sind nicht dazu berechtigt, diese Seite aufzurufen!')
+                )
+            );
+
+            $this->error = true;
+            return;
+        }
+        
+        $this->user_name = Request::get('user_name', null);
+        if($this->user_name) {
+            //searched for teacher
+            
+            $this->users = User::findBySql(
+                "(vorname LIKE CONCAT('%', :user_name, '%')
+                OR nachname LIKE CONCAT('%', :user_name, '%')
+                OR username LIKE CONCAT('%', :user_name, '%'))
+                AND perms = 'dozent'",
+                array(
+                    'user_name' => $this->user_name
+                )
+            );
+            
+            $this->search_was_executed = true;
+        }
+        
+        if($this->users) {
+            //calculate number of files for each user:
+            $this->user_files_count = array();
+            foreach($this->users as $user) {
+                $this->user_files_count[$user->id] = StudipDocument::countBySql(
+                    "user_id = :user_id AND url = ''",
+                    array(
+                        'user_id' => $user->id
+                    )
+                );
+            }
+        }
+    }
+    
+    
     public function search_action()
     {
         Navigation::activateItem("/myprotectedfiles");
@@ -108,7 +163,8 @@ class MyController extends PluginController {
 
         $this->semester_id = Request::get('semester_id', '');
         $this->institute_id = Request::get('institute_id', '');
-        $this->criteria = Request::get('criteria', null);
+        $this->course_name = Request::get('course_name', null);
+        $this->user_name = Request::get('user_name', null);
         $this->selected_semester_id = $this->semester_id;
 
 
@@ -128,8 +184,8 @@ class MyController extends PluginController {
         );
 
 
-        if($this->criteria) {
-            //semester-ID or criteria (or both) are given:
+        if($this->course_name) {
+            //semester-ID or course_name (or both) are given:
             //The user wants to know the courses from the specified semester
             //which have a certain name.
 
@@ -175,16 +231,16 @@ class MyController extends PluginController {
                             OR (seminare.start_time < :semester_start_time AND seminare.start_time + seminare.duration_time >= :semester_start_time)
                         )
                         AND
-                        (name LIKE CONCAT('%', :criteria, '%')
-                        OR untertitel LIKE CONCAT('%', :criteria, '%')
-                        OR beschreibung LIKE CONCAT('%', :criteria, '%')) "
+                        (name LIKE CONCAT('%', :course_name, '%')
+                        OR untertitel LIKE CONCAT('%', :course_name, '%')
+                        OR beschreibung LIKE CONCAT('%', :course_name, '%')) "
                         . (($institute_id_list)
                           ? "AND (seminare.institut_id in ( :institute_id_list )) "
                           : "")
                         . "ORDER BY seminare.name ASC",
                         array(
                             'semester_start_time' => $semester->beginn,
-                            'criteria' => $this->criteria,
+                            'course_name' => $this->course_name,
                             'institute_id_list' => $institute_id_list
                         )
                     );
@@ -193,15 +249,15 @@ class MyController extends PluginController {
             } else {
                 //no semester selected
                 $this->courses = Course::findBySql(
-                    "(name LIKE CONCAT('%', :criteria, '%')
-                    OR untertitel LIKE CONCAT('%', :criteria, '%')
-                    OR beschreibung LIKE CONCAT('%', :criteria, '%')) "
+                    "(name LIKE CONCAT('%', :course_name, '%')
+                    OR untertitel LIKE CONCAT('%', :course_name, '%')
+                    OR beschreibung LIKE CONCAT('%', :course_name, '%')) "
                     . (($institute_id_list)
                         ? "AND (seminare.institut_id in ( :institute_id_list )) "
                         : "")
                     . " ORDER BY name ASC",
                     array(
-                        'criteria' => $this->criteria,
+                        'course_name' => $this->course_name,
                         'institute_id_list' => $institute_id_list
                     )
                 );
@@ -263,13 +319,34 @@ class MyController extends PluginController {
 
             $this->search_was_executed = true;
         }
+        
+        
+        if($this->courses) {
+            //calculate number of files for each course:
+            $this->course_files_count = array();
+            foreach($this->courses as $course) {
+                $this->course_files_count[$course->id] = StudipDocument::countBySql(
+                    "seminar_id = :course_id AND url = ''",
+                    array(
+                        'course_id' => $course->id
+                    )
+                );
+            }
+        }
+        
     }
 
 
     public function files_action()
     {
+        global $perm;
+        
         if(!Request::get('cid')) {
             URLHelper::removeLinkParam('cid');
+        }
+        
+        if(!Request::get('user_id')) {
+            URLHelper::removeLinkParam('user_id');
         }
 
         if(Navigation::hasItem("/myprotectedfiles/files")) {
@@ -304,11 +381,53 @@ class MyController extends PluginController {
                 $this->files[$key]->setData($row, false);
                 $this->files[$key]->setNew(false);
             }
+        } elseif(Request::option('user_id')) {
+            //The user wants to see the files of a teacher.
+            
+            
+            $this->user = User::find(Request::get('user_id'));
+            if(!$this->user) {
+                //no results
+                $this->search_was_executed = true;
+                return;
+            }
+            
+            if(!$perm->have_perm('admin')
+                or ($this->user->perms != 'dozent')) {
+                throw new AccessDeniedException();
+            } else {
+                $this->user_search = true;
+                URLHelper::addLinkParam('user_id', $this->user->id);
+            }
+            
+            $sql = "SELECT dokumente.*
+                FROM dokumente INNER JOIN (
+                    SELECT seminar_id as id FROM seminare
+                    UNION
+                    SELECT institut_id as id FROM Institute
+                ) bla ON bla.id = dokumente.seminar_id
+                WHERE user_id = ?
+                AND dokumente.url = ''
+                ORDER BY mkdate DESC";
+
+            $db = DBManager::get();
+            $statement = $db->prepare($sql);
+            $statement->execute(array($this->user->id));
+            $data = $statement->fetchAll(PDO::FETCH_ASSOC); //fetchFirst istn't available in Stud.IP 2.5
+            $this->files = array();
+            foreach($data as $key => $row) {
+                //SORM::buildExisting and SORM::build are not available in Stud.IP 2.5:
+                $this->files[$key] = new StudipDocument();
+                $this->files[$key]->setData($row, false);
+                $this->files[$key]->setNew(false);
+            }
+            
+            
         } elseif (Request::option("cid")) {
-            if (!$GLOBALS['perm']->have_studip_perm('admin', Request::option("cid"))) {
+            //The user wants to see all files of a course.
+            if (!$perm->have_studip_perm('admin', Request::option("cid"))) {
                 throw new AccessDeniedException();
             }
-            //user wants to see all files of a course
 
             $this->course = Course::find(Request::option("cid"));
             if(!$this->course) {
@@ -319,6 +438,8 @@ class MyController extends PluginController {
                 );
                 return;
             }
+            
+            URLHelper::addLinkParam('cid', $this->course->id);
 
             $statement = DBManager::get()->prepare("
                 SELECT dokumente.*
@@ -394,51 +515,65 @@ class MyController extends PluginController {
     public function command_action() {
         if (Request::isPost()) {
             $course = Course::find(Request::get('cid'));
+            $user = User::find(Request::get('user_id'));
             global $perm;
 
+            $params = array();
+            
+            if(Request::option('semester_id')) {
+                $params['semester_id'] = Request::option('semester_id');
+            }
+            
+            if($course) {
+                $params['cid'] = $course->id;
+            }
+            
+            if($user) {
+                $params['user_id'] = $user->id;
+            }
+            
+            
+            
             if (Request::get("action") === "delete") {
                 foreach (Request::getArray("d") as $file_id) {
                     $file = new StudipDocument($file_id);
                     if (
                         ($file->checkAccess($GLOBALS['user']->id) &&
                             $file['user_id'] === $GLOBALS['user']->id) ||
-                            ($course && $perm->have_perm('admin'))
+                            ($course && $perm->have_perm('admin')) || 
+                            ($user && ($user->perms == 'dozent') && $perm->have_perm('admin'))
                         ){
                         $file->delete();
                     }
                 }
                 PageLayout::postMessage(MessageBox::success(dgettext('lizenzstatus', "Ausgewählte Dateien wurden gelöscht.")));
+                
                 $this->redirect(
                     PluginEngine::getUrl(
                         $this->plugin,
-                        array(
-                            'semester_id' => Request::option("semester_id"),
-                            'cid' => Request::get('cid')
-                        ),
+                        $params,
                         'my/files'
                     )
                 );
+                
             } elseif (Request::get("action") === "selectlicense") {
                 $_SESSION['SWITCH_FILES'] = Request::getArray("d");
+                
                 $this->redirect(
                     PluginEngine::getUrl(
                         $this->plugin,
-                        array(
-                            'semester_id' => Request::option("semester_id"),
-                            'cid' => Request::get('cid')
-                        ),
+                        $params,
                         'my/selectlicense'
                     )
                 );
+                
             } elseif (Request::get("action") === "download") {
                 $_SESSION['DOWNLOAD_FILES'] = Request::getArray("d");
+                
                 $this->redirect(
                     PluginEngine::getUrl(
                         $this->plugin,
-                        array(
-                            'semester_id' => Request::option("semester_id"),
-                            'cid' => Request::get('cid')
-                        ),
+                        $params,
                         'my/download'
                     )
                 );
@@ -450,6 +585,9 @@ class MyController extends PluginController {
         PageLayout::setTitle(dgettext('lizenzstatus', "Ausgewählte Dateien verändern"));
 
         $course = Course::find(Request::get('cid'));
+        $user = User::find(Request::get('user_id'));
+        
+        
         global $perm;
         if($course and !$perm->have_perm('admin')) {
             PageLayout::postMessage(
@@ -459,40 +597,56 @@ class MyController extends PluginController {
             );
             return;
         }
+        if($user) {
+            if(($user->perms != 'dozent') or !$perm->have_perm('admin')) {
+                PageLayout::postMessage(
+                    MessageBox::error(
+                        dgettext('lizenzstatus', 'Sie sind nicht dazu berechtigt, Dateien eines anderen Nutzers zu ändern!')
+                    )
+                );
+                return;
+            }
+        }
+        
 
         if (Request::isPost()) {
+            $changed_documents = 0;
             foreach (Request::getArray("d") as $file) {
                 $this->file = new StudipDocument($file);
                 if (($this->file->checkAccess($GLOBALS['user']->id) && $this->file['user_id'] === $GLOBALS['user']->id) ||
-                    ($course and $perm->have_perm('admin'))) {
+                    ($course and $perm->have_perm('admin')) || 
+                    ($user and $user->perms == 'dozent' and $perm->have_perm('admin'))
+                    ) {
                     $this->file['protected'] = Request::int("license", 0);
                     $this->file->store();
+                    $changed_documents++;
                 }
             }
-            PageLayout::postMessage(MessageBox::success(sprintf(dgettext('lizenzstatus', "%s Dokumente verändert."), count(Request::getArray("d")))));
+            PageLayout::postMessage(MessageBox::success(sprintf(dgettext('lizenzstatus', "%s Dokumente verändert."), $changed_documents)));
+            
+            
+            $params = array();
+            
             if(Request::option('semester_id')) {
-                $this->redirect(PluginEngine::getUrl(
-                    $this->plugin,
-                    array(
-                        'semester_id' => Request::option('semester_id')
-                    ),
-                    'my/files'
-                ));
-            } elseif(Request::get('cid')) {
-                $this->redirect(PluginEngine::getUrl(
-                    $this->plugin,
-                    array(
-                        'cid' => Request::get('cid')
-                    ),
-                    'my/files'
-                ));
-            } else {
-                $this->redirect(PluginEngine::getUrl(
-                    $this->plugin,
-                    array(),
-                    'my/files'
-                ));
+                $params['semester_id'] = Request::option('semester_id');
             }
+            
+            /*
+            if($course) {
+                $params['cid'] = $course->id;
+            }
+            
+            if($user) {
+                $params['user_id'] = $user->id;
+            }
+            */
+            
+            $this->redirect(PluginEngine::getUrl(
+                $this->plugin,
+                $params,
+                'my/files'
+            ));
+            
         }
         $statement = DBManager::get()->prepare("
             SELECT * FROM document_licenses WHERE license_id >= 2 ORDER BY license_id ASC
@@ -517,11 +671,15 @@ class MyController extends PluginController {
         global $perm, $TMP_PATH;
 
         $course = Course::find(Request::get('cid'));
-
-        $zipfile_id = createSelectedZip($_SESSION['DOWNLOAD_FILES']);
+        $user = User::find(Request::get('user_id'));
+        
+        
+        $zipfile_id = createSelectedZip($_SESSION['DOWNLOAD_FILES'], false);
 
         if($course and $perm->have_perm('admin')) {
             $file_name = "Dateien von ".$course->name.'.zip';
+        } elseif(($user && ($user->perms == 'dozent') && $perm->have_perm('admin'))) {
+            $file_name = "Dateien von ".$user->username.'.zip';
         } else {
             $file_name = "Meine Dateien.zip";
         }

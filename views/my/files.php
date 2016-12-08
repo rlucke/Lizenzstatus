@@ -10,8 +10,18 @@
                 $course->name
                 ) ?>&nbsp;(<?=count($files)?>)
             <? else: ?>
-            <?= dgettext('lizenzstatus', "Ihre selbst hochgeladenen Dokumente") ?>
-            &nbsp;(<?=count($files)?>)
+            <? if($user && $user_search): ?>
+            <?= sprintf(
+                    dgettext('lizenzstatus', "Hochgeladenen Dokumente von %s"),
+                    (version_compare($GLOBALS['SOFTWARE_VERSION'], '3.1', '>=')
+                    ? htmlReady($user->getFullName())
+                    : htmlReady($user->name)
+                    )
+                ) ?>&nbsp;(<?=count($files)?>)
+            <? else: ?>
+            <?= dgettext('lizenzstatus', "Ihre selbst hochgeladenen Dokumente") ?>&nbsp;(<?=count($files)?>)
+            <? endif?>
+            
             <? endif ?>
         </caption>
         <thead>
@@ -32,7 +42,7 @@
         </thead>
         <tbody>
         <? foreach ($files as $file) : ?>
-            <? $access = $file->checkAccess($GLOBALS['user']->id) ?>
+            <? $access = $file->checkAccess($GLOBALS['user']->id) || $user_search ?>
             <? if (!$access and !$course) continue; ?>
             <tr id="doc_<?= htmlReady($file->getId()) ?>" data-dokument_id="<?= htmlReady($file->getId()) ?>">
                 <td>
@@ -227,7 +237,7 @@ if(version_compare($GLOBALS['SOFTWARE_VERSION'], '3.1', '>=')) {
         array('onClick' => "jQuery('#action').val('download'); jQuery('#action_form').removeAttr('data-dialog', '1').submit(); return false;")
     );
     
-    if(Request::get('cid')) {
+    if(Request::get('cid') or Request::get('user_id')) {
         $actions->addLink(
             dgettext('lizenzstatus', 'Zurück zu meinen Dateien'),
             PluginEngine::getUrl($plugin, array(), 'my/reset'),
