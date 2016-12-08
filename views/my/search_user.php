@@ -1,4 +1,4 @@
-<p><?= dgettext('lizenzstatus', 'Auf dieser Seite können Lehrende gesucht werden und zum Bearbeiten ihrer Dateien ausgewählte werden.') ?></p>
+<p><?= dgettext('lizenzstatus', 'Auf dieser Seite können Lehrende gesucht werden und zum Bearbeiten ihrer Dateien ausgewählt werden.') ?></p>
 <? if (!$error): ?>
 <form name="search" action="" method="post" class="default">
     <fieldset>
@@ -36,7 +36,11 @@
                     : htmlReady($user->name) ?></a>
             </td>
             <td>
+                <? if($user_files_count[$user->id] > 0): ?>
+                <strong><?= htmlReady($user_files_count[$user->id]) ?></strong>
+                <? else: ?>
                 <?= htmlReady($user_files_count[$user->id]) ?>
+                <? endif ?>
             </td>
         </tr>
         <? endforeach ?>

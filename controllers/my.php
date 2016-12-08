@@ -171,7 +171,8 @@ class MyController extends PluginController {
         $this->user_name = Request::get('user_name', null);
         $this->selected_semester_id = $this->semester_id;
 
-
+        
+        
         //semester selector is always filled:
         $this->available_semesters = Semester::getAll();
 
@@ -187,17 +188,63 @@ class MyController extends PluginController {
             )
         );
 
+        
+        if(!$this->semester_id and !$this->institute_id and !$this->course_name
+            and !$this->user_name) {
+                //no search was started
+                $this->no_parameters = true;
+                return;
+        }
+        
+        
+        $institute_id_list = array();
+        
+        $sql = '';
+        $sql_params = array();
+        
+        
+        if($this->user_name) {
+            $sql .= "INNER JOIN seminar_user ON seminare.seminar_id = seminar_user.seminar_id
+                INNER JOIN auth_user_md5 ON seminar_user.user_id = auth_user_md5.user_id
+                WHERE (auth_user_md5.username LIKE CONCAT('%', :user_name, '%')
+                    OR auth_user_md5.vorname LIKE CONCAT('%', :user_name, '%')
+                    OR auth_user_md5.nachname LIKE CONCAT('%', :user_name, '%')) 
+                    AND (auth_user_md5.perms = 'dozent') ";
+            $sql_params['user_name'] = $this->user_name;
+        }
+        
+        
+        $institute_id_list = array();
+        
+        if($this->institute_id) {
+            //The user wants to get all courses of an institute:
+            $institute = Institute::find($this->institute_id);
 
-        if($this->course_name) {
-            //semester-ID or course_name (or both) are given:
-            //The user wants to know the courses from the specified semester
-            //which have a certain name.
+            if($institute) {
+
+                $institute_id_list[] = $institute->id;
+
+                if($institute->is_fak) {
+                    //for facultys, we must also look at the courses from
+                    //institutes inside the faculty:
+                    $sub_institutes = Institute::findByFakultaets_id($institute->id);
+
+                    foreach($sub_institutes as $sub_institute) {
+                        $institute_id_list[] = $sub_institute->id;
+                    }
+                }
+
+                $this->selected_institute_id = $this->institute_id;
+
+            }
+
+        } else {
+            //In case no institute is given we must limit the search results
+            //to the institutes where the user is admin
 
             $current_user = User::findCurrent();
 
             $institute_memberships = $current_user->institute_memberships;
-
-            $institute_id_list = array();
 
             if($institute_memberships) {
 
@@ -217,113 +264,51 @@ class MyController extends PluginController {
                     }
                 }
             }
+        }
 
+        if($institute_id_list) {
             $institute_id_list = array_unique($institute_id_list);
-
-
-            if($this->semester_id) {
-                //course name selected
-
-                $semester = Semester::find($this->semester_id);
-
-                if($semester) {
-                    //...and semester selected
-                    $this->courses = Course::findBySql(
-                        "(
-                            seminare.start_time = :semester_start_time
-                            OR (seminare.start_time < :semester_start_time AND seminare.duration_time = -1)
-                            OR (seminare.start_time < :semester_start_time AND seminare.start_time + seminare.duration_time >= :semester_start_time)
-                        )
-                        AND
-                        (name LIKE CONCAT('%', :course_name, '%')
-                        OR untertitel LIKE CONCAT('%', :course_name, '%')
-                        OR beschreibung LIKE CONCAT('%', :course_name, '%')) "
-                        . (($institute_id_list)
-                          ? "AND (seminare.institut_id in ( :institute_id_list )) "
-                          : "")
-                        . "ORDER BY seminare.name ASC",
-                        array(
-                            'semester_start_time' => $semester->beginn,
-                            'course_name' => $this->course_name,
-                            'institute_id_list' => $institute_id_list
-                        )
-                    );
-                }
-
-            } else {
-                //no semester selected
-                $this->courses = Course::findBySql(
-                    "(name LIKE CONCAT('%', :course_name, '%')
-                    OR untertitel LIKE CONCAT('%', :course_name, '%')
-                    OR beschreibung LIKE CONCAT('%', :course_name, '%')) "
-                    . (($institute_id_list)
-                        ? "AND (seminare.institut_id in ( :institute_id_list )) "
-                        : "")
-                    . " ORDER BY name ASC",
-                    array(
-                        'course_name' => $this->course_name,
-                        'institute_id_list' => $institute_id_list
-                    )
-                );
+            
+            $sql_params['institute_id_list'] = $institute_id_list;
+            
+            if($this->user_name) {
+                $sql .= ' AND ';
             }
+            
+            $sql .= "(seminare.institut_id in ( :institute_id_list )) ";
+            
+            
+        }
 
-            $this->search_was_executed = true;
+        if($this->semester_id) {
+            //semester-ID selected
 
-        } elseif($this->institute_id) {
-            //The user wants to get all courses of an institute:
-            $institute = Institute::find($this->institute_id);
+            $semester = Semester::find($this->semester_id);
 
-            if($institute) {
-
-                $institute_id_list = array($institute->id);
-
-                if($institute->is_fak) {
-                    //for facultys, we must also look at the courses from
-                    //institutes inside the faculty:
-                    $sub_institutes = Institute::findByFakultaets_id($institute->id);
-
-                    foreach($sub_institutes as $sub_institute) {
-                        $institute_id_list[] = $sub_institute->id;
-                    }
-                }
-
-
-                $this->selected_institute_id = $this->institute_id;
-
-                if($this->semester_id) {
-                    //...and semester selected
-                    $semester = Semester::find($this->semester_id);
-
-                    if($semester) {
-                        $this->courses = Course::findBySql(
-                            "(
-                                seminare.start_time = :semester_start_time
-                                OR (seminare.start_time < :semester_start_time AND seminare.duration_time = -1)
-                                OR (seminare.start_time < :semester_start_time AND seminare.start_time + seminare.duration_time >= :semester_start_time)
-                            )
-                            AND
-                            (institut_id in ( :institute_id_list ))
-                            ORDER BY seminare.name ASC",
-                            array(
-                                'semester_start_time' => $semester->beginn,
-                                'institute_id_list' => $institute_id_list
-                            )
-                        );
-                    }
-                } else {
-                    //no semester selected
-                    $this->courses = Course::findBySql(
-                        'institut_id IN ( :institute_id_list ) ORDER BY name ASC',
-                        array(
-                            'institute_id_list' => $institute_id_list
-                        )
-                    );
-                }
+            if($semester) {
+                $sql .= "AND ( seminare.start_time = :semester_start_time
+                    OR (seminare.start_time < :semester_start_time AND seminare.duration_time = -1)
+                    OR (seminare.start_time < :semester_start_time AND seminare.start_time + seminare.duration_time >= :semester_start_time) ) ";
+                $sql_params['semester_start_time'] = $semester->beginn;
             }
-
-            $this->search_was_executed = true;
         }
         
+        
+        if($this->course_name) {
+            $sql .= "AND (name LIKE CONCAT('%', :course_name, '%')
+                OR untertitel LIKE CONCAT('%', :course_name, '%')
+                OR beschreibung LIKE CONCAT('%', :course_name, '%')) ";
+            $sql_params['course_name'] = $this->course_name;
+        }
+        
+        $sql .= "ORDER BY seminare.name ASC";
+        
+        
+        $this->courses = Course::findBySql($sql, $sql_params);
+        
+        
+        $this->search_was_executed = true;
+
         
         if($this->courses) {
             //calculate number of files for each course:

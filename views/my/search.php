@@ -1,4 +1,4 @@
-<p><?= dgettext('lizenzstatus', 'Auf dieser Seite können Veranstaltungen entweder anhand deren Namen und einem Semester oder anhand deren Einrichtung und einem Semester gesucht werden.') ?></p>
+<p><?= dgettext('lizenzstatus', 'Auf dieser Seite können Veranstaltungen anhand deren Namen, dem Namen eines Lehrenden, einer Einrichtung und einem Semester gesucht werden.') ?></p>
 <? if (!$error): ?>
 <form name="search" action="" method="post" class="default">
     <fieldset>
@@ -11,8 +11,8 @@
         
         <label>
             <?= dgettext('lizenzstatus', 'Name eines Lehrenden') . ':'; ?>
-            <input type="text" minlength="2" name="teacher_name"
-                value="<?= htmlReady($teacher_name) ?>">
+            <input type="text" minlength="2" name="user_name"
+                value="<?= htmlReady($user_name) ?>">
         </label>
 <? if ($available_institutes): ?>
         <label>
@@ -87,12 +87,20 @@
                 <?= ($course->start_semester) ? $course->start_semester->name : '' ?>
             </td>
             <td>
+                <? if($course_files_count[$course->id] > 0): ?>
+                <strong><?= htmlReady($course_files_count[$course->id]) ?></strong>
+                <? else: ?>
                 <?= htmlReady($course_files_count[$course->id]) ?>
+                <? endif ?>
             </td>
         </tr>
         <? endforeach ?>
     <? else: ?>
-    <tr><td colspan="4"><?= dgettext('lizenzstatus', 'Es wurden keine Veranstaltungen gefunden!') ?></td></tr>
+        <? if($no_parameters): ?>
+        <tr><td colspan="4"><?= dgettext('lizenzstatus', 'Es wurden keine Suchparameter gesetzt!') ?></td></tr>
+        <? else: ?>
+        <tr><td colspan="4"><?= dgettext('lizenzstatus', 'Es wurden keine Veranstaltungen gefunden!') ?></td></tr>
+        <? endif ?>
     <? endif ?>
     </tbody>
 </table>
