@@ -215,7 +215,7 @@ class MyController extends PluginController {
         
         $institute_id_list = array();
         
-        $sql = 'SELECT * FROM seminare ';
+        $sql = 'SELECT seminare.* FROM seminare ';
         $sql_params = array();
         
         
@@ -294,6 +294,8 @@ class MyController extends PluginController {
             
             if($this->user_name) {
                 $sql .= ' AND ';
+            } else {
+                $sql .= ' WHERE ';
             }
             
             $sql .= "(seminare.institut_id in ( :institute_id_list )) ";
