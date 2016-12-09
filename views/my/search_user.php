@@ -1,5 +1,5 @@
-<p><?= dgettext('lizenzstatus', 'Auf dieser Seite können Lehrende gesucht werden und zum Bearbeiten ihrer Dateien ausgewählt werden.') ?></p>
 <? if (!$error): ?>
+<p><?= dgettext('lizenzstatus', 'Auf dieser Seite können Lehrende gesucht werden und zum Bearbeiten ihrer Dateien ausgewählt werden.') ?></p>
 <form name="search" action="" method="post" class="default">
     <fieldset>
         <legend><?= dgettext('lizenzstatus', 'Suche nach Lehrenden'); ?></legend>

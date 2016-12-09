@@ -56,10 +56,11 @@ class Lizenzstatus extends StudIPPlugin implements SystemPlugin {
             $subnav = new Navigation(dgettext('lizenzstatus', 'Suche nach Veranstaltungen'));
             $subnav->setUrl(PluginEngine::getURL($this, array(), 'my/search'));
             $nav->addSubNavigation('search', $subnav);
-            
-            $subnav = new Navigation(dgettext('lizenzstatus', 'Suche nach Lehrenden'));
-            $subnav->setUrl(PluginEngine::getURL($this, array(), 'my/search_user'));
-            $nav->addSubNavigation('search_user', $subnav);
+            if($perm->have_perm('root')) {
+                $subnav = new Navigation(dgettext('lizenzstatus', 'Suche nach Lehrenden'));
+                $subnav->setUrl(PluginEngine::getURL($this, array(), 'my/search_user'));
+                $nav->addSubNavigation('search_user', $subnav);
+            }
         }
         
         

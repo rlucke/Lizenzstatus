@@ -103,7 +103,7 @@ class MyController extends PluginController {
         
         global $perm;
 
-        if(!$perm->have_perm('admin')) {
+        if(!$perm->have_perm('root')) {
             PageLayout::postMessage(
                 MessageBox::error(
                     dgettext('lizenzstatus', 'Sie sind nicht dazu berechtigt, diese Seite aufzurufen!')
@@ -432,12 +432,19 @@ class MyController extends PluginController {
             $this->user = User::find(Request::get('user_id'));
             if(!$this->user) {
                 //no results
-                $this->search_was_executed = true;
+                $this->search_was_executed = false;
+                URLHelper::removeLinkParam('user_id');
+                $this->redirect(PluginEngine::getUrl(
+                        $this->plugin,
+                        $params,
+                        'my/files'
+                ));
                 return;
             }
             
-            if(!$perm->have_perm('admin')
+            if(!$perm->have_perm('root')
                 or ($this->user->perms != 'dozent')) {
+                //user is not root or the target user is not a teacher
                 throw new AccessDeniedException();
             } else {
                 $this->user_search = true;

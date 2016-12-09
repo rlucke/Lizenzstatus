@@ -18,10 +18,8 @@
                     )
                 ) ?>&nbsp;(<?= dgettext('lizenzstatus', 'insgesamt') . ' ' . count($files)?>)
             <? elseif($course_list): ?>
-            <?= sprintf(
-                    dgettext('lizenzstatus', "Hochgeladenen Dokumente in den Veranstaltungen %s"),
-                    implode($course_names, ', ')
-                ) ?>&nbsp;(<?= dgettext('lizenzstatus', 'insgesamt') . ' ' . count($files)?>)
+            <?= dgettext('lizenzstatus', "Hochgeladenen Dokumente aus Veranstaltungen")
+                ?>&nbsp;(<?= dgettext('lizenzstatus', 'insgesamt') . ' ' . count($files)?>)
             <? else: ?>
             <?= dgettext('lizenzstatus', "Ihre selbst hochgeladenen Dokumente") 
                 ?>&nbsp;(<?= dgettext('lizenzstatus', 'insgesamt') . ' ' . count($files)?>)
