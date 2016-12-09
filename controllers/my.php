@@ -301,7 +301,7 @@ class MyController extends PluginController {
             $sql_params['course_name'] = $this->course_name;
         }
         
-        $sql .= "ORDER BY seminare.name ASC";
+        $sql .= "GROUP BY name ORDER BY seminare.name ASC";
         
         
         $this->courses = Course::findBySql($sql, $sql_params);
