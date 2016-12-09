@@ -8,20 +8,23 @@
             <?= sprintf(
                 dgettext('lizenzstatus', 'Hochgeladene Dokumente in Veranstaltung %s'),
                 $course->name
-                ) ?>&nbsp;(<?=count($files)?>)
-            <? else: ?>
-            <? if($user && $user_search): ?>
+                ) ?>&nbsp;(<?= dgettext('lizenzstatus', 'insgesamt') . ' ' . count($files)?>)
+            <? elseif($user && $user_search): ?>
             <?= sprintf(
                     dgettext('lizenzstatus', "Hochgeladenen Dokumente von %s"),
                     (version_compare($GLOBALS['SOFTWARE_VERSION'], '3.1', '>=')
                     ? htmlReady($user->getFullName())
                     : htmlReady($user->vorname . ' ' . $user->nachname)
                     )
-                ) ?>&nbsp;(<?=count($files)?>)
+                ) ?>&nbsp;(<?= dgettext('lizenzstatus', 'insgesamt') . ' ' . count($files)?>)
+            <? elseif($course_list): ?>
+            <?= sprintf(
+                    dgettext('lizenzstatus', "Hochgeladenen Dokumente in den Veranstaltungen %s"),
+                    implode($course_names, ', ')
+                ) ?>&nbsp;(<?= dgettext('lizenzstatus', 'insgesamt') . ' ' . count($files)?>)
             <? else: ?>
-            <?= dgettext('lizenzstatus', "Ihre selbst hochgeladenen Dokumente") ?>&nbsp;(<?=count($files)?>)
-            <? endif?>
-            
+            <?= dgettext('lizenzstatus', "Ihre selbst hochgeladenen Dokumente") 
+                ?>&nbsp;(<?= dgettext('lizenzstatus', 'insgesamt') . ' ' . count($files)?>)
             <? endif ?>
         </caption>
         <thead>
@@ -30,11 +33,12 @@
                     <input type="checkbox" data-proxyfor=".filelist :checkbox.file">
                 </th>
                 <th><a><?= dgettext('lizenzstatus', "Dateiname") ?></a></th>
-                <? if ($course): ?>
-                <th><a><?= dgettext('lizenzstatus', 'Nutzer') ?></a></th>
-                <? else: ?>
+                <? if ($course_list or !$course): ?>
                 <th><a><?= dgettext('lizenzstatus', "Veranstaltung") ?></a></th>
                 <th><a><?= dgettext('lizenzstatus', "Semester") ?></a></th>
+                <? endif ?>
+                <? if ($course_list or $course): ?>
+                <th><a><?= dgettext('lizenzstatus', 'Nutzer') ?></a></th>
                 <? endif ?>
                 <th><a><?= dgettext('lizenzstatus', "Datum") ?></a></th>
                 <th><a><?= dgettext('lizenzstatus', "Lizenzstatus") ?></a></th>
@@ -63,25 +67,7 @@
                     </a>
                     <? endif ?>
                 </td>
-                <? if ($course): ?>
-                    <td>
-                        <a href="<?= URLHelper::getLink("folder.php#anker", array(
-                            'user_id' => $file['user_id'],
-                            'data' => array(
-                                'cmd' => "tree",
-                                'open' => array(
-                                    $file['range_id'] => 1,
-                                    $file->getId() => 1
-                                )
-                            ),
-                            'open' => $file->getId()
-                        )) ?>">
-                        <? $file_user = User::find($file->user_id); ?>
-
-                            <?= htmlReady($file_user ? $file_user->getFullName() : dgettext('lizenzstatus', 'unbekannt')) ?>
-                        </a>
-                    </td>
-                <? else: ?>
+                <? if ($course_list or !$course): ?>
                     <td>
                         <a href="<?= URLHelper::getLink("folder.php#anker", array(
                             'cid' => $file['seminar_id'],
@@ -114,6 +100,25 @@
                     <? else : ?>
                         <td data-timestamp="0">-</td>
                     <? endif ?>
+                <? endif ?>
+                <? if ($course_list or $course): ?>
+                    <td>
+                        <a href="<?= URLHelper::getLink("folder.php#anker", array(
+                            'user_id' => $file['user_id'],
+                            'data' => array(
+                                'cmd' => "tree",
+                                'open' => array(
+                                    $file['range_id'] => 1,
+                                    $file->getId() => 1
+                                )
+                            ),
+                            'open' => $file->getId()
+                        )) ?>">
+                        <? $file_user = User::find($file->user_id); ?>
+
+                            <?= htmlReady($file_user ? $file_user->getFullName() : dgettext('lizenzstatus', 'unbekannt')) ?>
+                        </a>
+                    </td>
                 <? endif ?>
                 <td data-timestamp="<?= htmlReady($file['mkdate']) ?>">
                     <?= date("d.m.Y H:i", $file['mkdate'])." ".dgettext('lizenzstatus', "Uhr") ?>
@@ -237,7 +242,8 @@ if(version_compare($GLOBALS['SOFTWARE_VERSION'], '3.1', '>=')) {
         array('onClick' => "jQuery('#action').val('download'); jQuery('#action_form').removeAttr('data-dialog', '1').submit(); return false;")
     );
     
-    if(Request::get('cid') or Request::get('user_id')) {
+    if(Request::get('cid') or Request::get('user_id') or
+        !empty($_SESSION['LIZENZSTATUS_SELECTED_COURSE_IDS'])) {
         $actions->addLink(
             dgettext('lizenzstatus', 'Zurück zu meinen Dateien'),
             PluginEngine::getUrl($plugin, array(), 'my/reset'),
@@ -249,7 +255,7 @@ if(version_compare($GLOBALS['SOFTWARE_VERSION'], '3.1', '>=')) {
     
     Sidebar::Get()->addWidget($actions);
 
-    if(!Request::get('cid') and !Request::get('user_id')) {
+    if(!Request::get('cid') and !Request::get('user_id') and empty($_SESSION['LIZENZSTATUS_SELECTED_COURSE_IDS'])) {
         $semester_select = new SelectWidget(
             dgettext('lizenzstatus', "Nach Semester filtern"),
             PluginEngine::getLink($plugin, array(), "my/files"),

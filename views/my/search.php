@@ -46,14 +46,21 @@
                 <? endforeach ?>
             </select>
         </label>
+        <? if(!$available_institutes): ?>
+        <p><strong><?= dgettext('lizenzstatus', 'Hinweis') . ':' ?></strong>
+            <?= dgettext('lizenzstatus', 'Da Sie keiner Einrichtung zugeordnet sind, können Sie Veranstaltungen nicht nach einer Einrichtung filtern!') ?>
+        </p>
+        <? endif?>
     </fieldset>
     <?= \Studip\Button::create(dgettext('lizenzstatus', 'Suchen')) ?>
 </form>
 <? if($search_was_executed): ?>
+<form action="files" method="post" class="default">
 <table class="default">
     <caption><?= dgettext('lizenzstatus', 'Suchergebnisse') ?>&nbsp;(<?=count($courses)?>)</caption>
     <thead>
         <tr>
+            <th></th>
             <th><?= dgettext('lizenzstatus', 'Name der Veranstaltung') ?></th>
             <th><?= dgettext('lizenzstatus', 'Lehrende') ?></th>
             <th><?= dgettext('lizenzstatus', 'Semester') ?></th>
@@ -64,6 +71,9 @@
     <? if($courses): ?>
         <? foreach ($courses as $course): ?>
         <tr>
+            <td>
+                <input type="checkbox" name="course_id_list[]" value="<?= $course->id ?>">
+            </td>
             <td>
                 <a href="<?= PluginEngine::getLink(
                     $plugin,
@@ -120,12 +130,14 @@
         <? endforeach ?>
     <? else: ?>
         <? if($no_parameters): ?>
-        <tr><td colspan="4"><?= dgettext('lizenzstatus', 'Es wurden keine Suchparameter gesetzt!') ?></td></tr>
+        <tr><td colspan="5"><?= dgettext('lizenzstatus', 'Es wurden keine Suchparameter gesetzt!') ?></td></tr>
         <? else: ?>
-        <tr><td colspan="4"><?= dgettext('lizenzstatus', 'Es wurden keine Veranstaltungen gefunden!') ?></td></tr>
+        <tr><td colspan="5"><?= dgettext('lizenzstatus', 'Es wurden keine Veranstaltungen gefunden!') ?></td></tr>
         <? endif ?>
     <? endif ?>
     </tbody>
 </table>
+<?= \Studip\Button::create(dgettext('lizenzstatus', 'Dateien anzeigen')) ?>
+</form>
 <? endif ?>
 <? endif ?>
