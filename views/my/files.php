@@ -46,7 +46,7 @@
         </thead>
         <tbody>
         <? foreach ($files as $file) : ?>
-            <? $access = $file->checkAccess($GLOBALS['user']->id) || $user_search ?>
+            <? $access = $file->checkAccess($GLOBALS['user']->id) || $user_search  || $course_list ?>
             <? if (!$access and !$course) continue; ?>
             <tr id="doc_<?= htmlReady($file->getId()) ?>" data-dokument_id="<?= htmlReady($file->getId()) ?>">
                 <td>
