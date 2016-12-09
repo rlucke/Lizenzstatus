@@ -5,117 +5,254 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: Lizenzstatus\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-11-30 18:44+0100\n"
-"PO-Revision-Date: 2016-11-30 18:16+0100\n"
-"Last-Translator: André Noack <noack@data-quest.de>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"POT-Creation-Date: 2016-12-09 14:48+0100\n"
+"PO-Revision-Date: 2016-12-09 15:02+0100\n"
+"Last-Translator: Moritz Strohm <strohm@data-quest.de>\n"
+"Language-Team: data-quest <LL@li.org>\n"
 "Language: en\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=windows-1252\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 1.5.4\n"
-
-#: ../views/my/selectlicense.php:7 ../views/shared/action-menu.php:26
-msgid "Lizenz auswählen"
-msgstr "choose license"
-
-#: ../views/my/selectlicense.php:26
-msgid "Speichern"
-msgstr "save"
-
-#: ../views/my/files.php:7
-msgid "Ihre selbst hochgeladenen Dokumente"
-msgstr "Your uploaded files"
-
-#: ../views/my/files.php:14
-msgid "Dateiname"
-msgstr "filename"
-
-#: ../views/my/files.php:15
-msgid "Veranstaltung"
-msgstr "course"
-
-#: ../views/my/files.php:16
-msgid "Semester"
-msgstr "semester"
-
-#: ../views/my/files.php:17
-msgid "Datum"
-msgstr "date"
-
-#: ../views/my/files.php:18 ../Lizenzstatus.class.php:21
-msgid "Lizenzstatus"
-msgstr "license state"
-
-#: ../views/my/files.php:67
-msgid "unbegrenzt"
-msgstr "unlimited"
-
-#: ../views/my/files.php:77
-msgid "Uhr"
-msgstr "clock"
-
-#: ../views/my/files.php:168 ../views/my/files.php:210
-msgid "Lizenzen der ausgewählten Dokumente setzen"
-msgstr "select license for choosen files"
-
-#: ../views/my/files.php:182 ../views/my/files.php:214
-msgid "Wirklich alle ausgewählten Dateien löschen?"
-msgstr "Confirm deletion of selected files."
-
-#: ../views/my/files.php:188
-msgid "Nach Semester filtern"
-msgstr "Filter for semester"
-
-#: ../views/my/files.php:193 ../views/my/files.php:228
-msgid "Alle"
-msgstr "All"
-
-#: ../views/my/files.php:216
-#, fuzzy
-msgid "Ausgewählte Dateien löschen"
-msgstr "Delete chosen files"
-
-msgid "Ausgewählte Dateien herunterladen."
-msgstr "Download chosen files."
-
-#: ../views/my/files.php:237
-msgid "Zuweisen"
-msgstr "assign"
-
-#: ../views/my/files.php:245
-#, fuzzy
-msgid "Aktionen:"
-msgstr "actions"
-
-#: ../views/my/files.php:255
-#, fuzzy
-msgid "Nach Semester filtern:"
-msgstr "filter for semester"
+"X-Generator: Poedit 1.6.10\n"
 
 #: ../views/shared/action-menu.php:16
 msgid "Aktionen"
-msgstr "actions"
+msgstr "Actions"
 
-#: ../controllers/my.php:43
+#: ../views/shared/action-menu.php:26 ../views/my/selectlicense.php:9
+msgid "Lizenz auswählen"
+msgstr "Choose license"
+
+#: ../views/my/files.php:9
+#, php-format
+msgid "Hochgeladene Dokumente in Veranstaltung %s"
+msgstr "Uploaded files in course %s"
+
+#: ../views/my/files.php:11 ../views/my/files.php:19 ../views/my/files.php:22
+#: ../views/my/files.php:25
+msgid "insgesamt"
+msgstr "total"
+
+#: ../views/my/files.php:14
+#, php-format
+msgid "Hochgeladenen Dokumente von %s"
+msgstr "Uploaded files from %s"
+
+#: ../views/my/files.php:21
+msgid "Hochgeladenen Dokumente aus Veranstaltungen"
+msgstr "Uploaded files from courses"
+
+#: ../views/my/files.php:24
+msgid "Ihre selbst hochgeladenen Dokumente"
+msgstr "Your uploaded files"
+
+#: ../views/my/files.php:33
+msgid "Dateiname"
+msgstr "Filename"
+
+#: ../views/my/files.php:35
+msgid "Veranstaltung"
+msgstr "Course"
+
+#: ../views/my/files.php:36 ../views/my/search.php:35
+#: ../views/my/search.php:66
+msgid "Semester"
+msgstr "Semester"
+
+#: ../views/my/files.php:39
+msgid "Nutzer"
+msgstr "User"
+
+#: ../views/my/files.php:41
+msgid "Datum"
+msgstr "Date"
+
+#: ../views/my/files.php:42 ../NewYear2017Cronjob.class.php:24
+#: ../Lizenzstatus.class.php:27
+msgid "Lizenzstatus"
+msgstr "Licenses"
+
+#: ../views/my/files.php:92
+msgid "unbegrenzt"
+msgstr "unlimited"
+
+#: ../views/my/files.php:117
+msgid "unbekannt"
+msgstr "unknown"
+
+#: ../views/my/files.php:122
+msgid "Uhr"
+msgstr "clock"
+
+#: ../views/my/files.php:217 ../views/my/files.php:282
+msgid "Lizenzen der ausgewählten Dokumente setzen"
+msgstr "Select licenses for files"
+
+#: ../views/my/files.php:226
+msgid "Ausgewählte Dateien löschen."
+msgstr "Delete selected files."
+
+#: ../views/my/files.php:231 ../views/my/files.php:286
+msgid "Wirklich alle ausgewählten Dateien löschen?"
+msgstr "Really delete selected files?"
+
+#: ../views/my/files.php:235 ../views/my/files.php:294
+msgid "Ausgewählte Dateien herunterladen."
+msgstr "Download selected files."
+
+#: ../views/my/files.php:246 ../views/my/files.php:300
+msgid "Zurück zu meinen Dateien"
+msgstr "Go back to my files"
+
+#: ../views/my/files.php:259
+msgid "Nach Semester filtern"
+msgstr "Filter by semester"
+
+#: ../views/my/files.php:264 ../views/my/files.php:313
+msgid "Alle"
+msgstr "All"
+
+#: ../views/my/files.php:288
+msgid "Ausgewählte Dateien löschen"
+msgstr "Delete selected files"
+
+#: ../views/my/files.php:322
+msgid "Zuweisen"
+msgstr "Assign"
+
+#: ../views/my/files.php:331
+msgid "Aktionen:"
+msgstr "Actions:"
+
+#: ../views/my/files.php:343
+msgid "Nach Semester filtern:"
+msgstr "Filter by semester:"
+
+#: ../views/my/search_user.php:2
+msgid "Auf dieser Seite können Lehrende gesucht werden und zum Bearbeiten ihrer Dateien ausgewählt werden."
+msgstr "On this page you can search for teachers and modify their files."
+
+#: ../views/my/search_user.php:5 ../Lizenzstatus.class.php:60
+msgid "Suche nach Lehrenden"
+msgstr "Search for teachers"
+
+#: ../views/my/search_user.php:7 ../views/my/search_user.php:19
+msgid "Name des Lehrenden"
+msgstr "Name of teacher"
+
+#: ../views/my/search_user.php:12 ../views/my/search.php:55
+msgid "Suchen"
+msgstr "Search"
+
+#: ../views/my/search_user.php:16 ../views/my/search.php:60
+msgid "Suchergebnisse"
+msgstr "Search results"
+
+#: ../views/my/search_user.php:20 ../views/my/search.php:67
+msgid "Anzahl Dateien"
+msgstr "Amount of files"
+
+#: ../views/my/search_user.php:48
+msgid "Es wurden keine Lehrenden gefunden!"
+msgstr "No teachers have been found!"
+
+#: ../views/my/selectlicense.php:31
+msgid "Speichern"
+msgstr "Save"
+
+#: ../views/my/search.php:1
+msgid "Auf dieser Seite können Veranstaltungen anhand deren Namen, dem Namen eines Lehrenden, einer Einrichtung und einem Semester gesucht werden."
+msgstr "On this page you can search for courses by their name, by the name of one teacher, by institute or by semester."
+
+#: ../views/my/search.php:5 ../Lizenzstatus.class.php:56
+msgid "Suche nach Veranstaltungen"
+msgstr "Search for courses"
+
+#: ../views/my/search.php:7 ../views/my/search.php:64
+msgid "Name der Veranstaltung"
+msgstr "Course's name"
+
+#: ../views/my/search.php:13
+msgid "Name eines Lehrenden"
+msgstr "Name of a teacher"
+
+#: ../views/my/search.php:19
+msgid "Einrichtung"
+msgstr "Institute"
+
+#: ../views/my/search.php:23 ../views/my/search.php:39
+msgid "alle"
+msgstr "all"
+
+#: ../views/my/search.php:50
+msgid "Hinweis"
+msgstr "Note"
+
+#: ../views/my/search.php:51
+msgid "Da Sie keiner Einrichtung zugeordnet sind, können Sie Veranstaltungen nicht nach einer Einrichtung filtern!"
+msgstr "Because you're not assigned to an institute you can't filter courses by an institute!"
+
+#: ../views/my/search.php:65
+msgid "Lehrende"
+msgstr "Teachers"
+
+#: ../views/my/search.php:133
+msgid "Es wurden keine Suchparameter gesetzt!"
+msgstr "No search parameters have been set!"
+
+#: ../views/my/search.php:135
+msgid "Es wurden keine Veranstaltungen gefunden!"
+msgstr "No courses have been found!"
+
+#: ../views/my/search.php:140
+msgid "Dateien anzeigen"
+msgstr "Show files"
+
+#: ../NewYear2017Cronjob.class.php:33
+msgid "Ändert den Download-Status bestimmter Lizenzen zum 1.1.2017, um den neuen Anforderungen der VG Wort gerecht zu werden."
+msgstr "Modifies the download state of specific licenses at the 1.1.2017 to comply with the new requirements of the VG Wort."
+
+#: ../Lizenzstatus.class.php:52
+msgid "Dateien"
+msgstr "Files"
+
+#: ../Lizenzstatus.class.php:78
+msgid "Informationen zu Uploads von Texten"
+msgstr "Information regarding uploading of text files"
+
+#: ../controllers/my.php:66
 msgid "Was bedeuten die Lizenzen?"
-msgstr "What do the licenses mean for you?"
+msgstr "What do the licenses mean?"
 
-#: ../controllers/my.php:147
-msgid "Ausgewählte Dateien wurden gelöscht."
-msgstr "Selected files were deleted."
+#: ../controllers/my.php:109 ../controllers/my.php:163
+msgid "Sie sind nicht dazu berechtigt, diese Seite aufzurufen!"
+msgstr "You're not permitted to access this page!"
 
-#: ../controllers/my.php:169
+#: ../controllers/my.php:489
+msgid "Veranstaltung nicht gefunden!"
+msgstr "Course not found!"
+
+#: ../controllers/my.php:666
+#, php-format
+msgid "%s Dateien wurden gelöscht."
+msgstr "%s files have been deleted."
+
+#: ../controllers/my.php:706
 msgid "Ausgewählte Dateien verändern"
-msgstr "Change selected files"
+msgstr "Modify selected files"
 
-#: ../controllers/my.php:178
+#: ../controllers/my.php:716
+msgid "Sie sind nicht dazu berechtigt, Dateien einer Veranstaltung zu ändern!"
+msgstr "You're not permitted to change files of a course!"
+
+#: ../controllers/my.php:725
+msgid "Sie sind nicht dazu berechtigt, Dateien eines anderen Nutzers zu ändern!"
+msgstr "You're not permitted to change files of another user!"
+
+#: ../controllers/my.php:747
 #, php-format
 msgid "%s Dokumente verändert."
-msgstr "%s files were changed."
+msgstr "%s files have been modified."
 
-#: ../Lizenzstatus.class.php:53
-msgid "Informationen zu Uploads von Texten"
-msgstr "Informations for uploading of text"

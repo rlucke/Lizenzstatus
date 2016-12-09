@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-11-30 18:44+0100\n"
+"POT-Creation-Date: 2016-12-09 14:48+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,103 +17,250 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: ../views/my/selectlicense.php:7 ../views/shared/action-menu.php:26
-msgid "Lizenz auswählen"
-msgstr ""
-
-#: ../views/my/selectlicense.php:26
-msgid "Speichern"
-msgstr ""
-
-#: ../views/my/files.php:7
-msgid "Ihre selbst hochgeladenen Dokumente"
-msgstr ""
-
-#: ../views/my/files.php:14
-msgid "Dateiname"
-msgstr ""
-
-#: ../views/my/files.php:15
-msgid "Veranstaltung"
-msgstr ""
-
-#: ../views/my/files.php:16
-msgid "Semester"
-msgstr ""
-
-#: ../views/my/files.php:17
-msgid "Datum"
-msgstr ""
-
-#: ../views/my/files.php:18 ../Lizenzstatus.class.php:21
-msgid "Lizenzstatus"
-msgstr ""
-
-#: ../views/my/files.php:67
-msgid "unbegrenzt"
-msgstr ""
-
-#: ../views/my/files.php:77
-msgid "Uhr"
-msgstr ""
-
-#: ../views/my/files.php:168 ../views/my/files.php:210
-msgid "Lizenzen der ausgewählten Dokumente setzen"
-msgstr ""
-
-#: ../views/my/files.php:177
-msgid "Ausgewählte Dateien löschen."
-msgstr ""
-
-#: ../views/my/files.php:182 ../views/my/files.php:214
-msgid "Wirklich alle ausgewählten Dateien löschen?"
-msgstr ""
-
-#: ../views/my/files.php:188
-msgid "Nach Semester filtern"
-msgstr ""
-
-#: ../views/my/files.php:193 ../views/my/files.php:228
-msgid "Alle"
-msgstr ""
-
-#: ../views/my/files.php:216
-msgid "Ausgewählte Dateien löschen"
-msgstr ""
-
-#: ../views/my/files.php:237
-msgid "Zuweisen"
-msgstr ""
-
-#: ../views/my/files.php:245
-msgid "Aktionen:"
-msgstr ""
-
-#: ../views/my/files.php:255
-msgid "Nach Semester filtern:"
-msgstr ""
-
 #: ../views/shared/action-menu.php:16
 msgid "Aktionen"
 msgstr ""
 
-#: ../controllers/my.php:43
+#: ../views/shared/action-menu.php:26 ../views/my/selectlicense.php:9
+msgid "Lizenz auswählen"
+msgstr ""
+
+#: ../views/my/files.php:9
+#, php-format
+msgid "Hochgeladene Dokumente in Veranstaltung %s"
+msgstr ""
+
+#: ../views/my/files.php:11 ../views/my/files.php:19 ../views/my/files.php:22
+#: ../views/my/files.php:25
+msgid "insgesamt"
+msgstr ""
+
+#: ../views/my/files.php:14
+#, php-format
+msgid "Hochgeladenen Dokumente von %s"
+msgstr ""
+
+#: ../views/my/files.php:21
+msgid "Hochgeladenen Dokumente aus Veranstaltungen"
+msgstr ""
+
+#: ../views/my/files.php:24
+msgid "Ihre selbst hochgeladenen Dokumente"
+msgstr ""
+
+#: ../views/my/files.php:33
+msgid "Dateiname"
+msgstr ""
+
+#: ../views/my/files.php:35
+msgid "Veranstaltung"
+msgstr ""
+
+#: ../views/my/files.php:36 ../views/my/search.php:35
+#: ../views/my/search.php:66
+msgid "Semester"
+msgstr ""
+
+#: ../views/my/files.php:39
+msgid "Nutzer"
+msgstr ""
+
+#: ../views/my/files.php:41
+msgid "Datum"
+msgstr ""
+
+#: ../views/my/files.php:42 ../NewYear2017Cronjob.class.php:24
+#: ../Lizenzstatus.class.php:27
+msgid "Lizenzstatus"
+msgstr ""
+
+#: ../views/my/files.php:92
+msgid "unbegrenzt"
+msgstr ""
+
+#: ../views/my/files.php:117
+msgid "unbekannt"
+msgstr ""
+
+#: ../views/my/files.php:122
+msgid "Uhr"
+msgstr ""
+
+#: ../views/my/files.php:217 ../views/my/files.php:282
+msgid "Lizenzen der ausgewählten Dokumente setzen"
+msgstr ""
+
+#: ../views/my/files.php:226
+msgid "Ausgewählte Dateien löschen."
+msgstr ""
+
+#: ../views/my/files.php:231 ../views/my/files.php:286
+msgid "Wirklich alle ausgewählten Dateien löschen?"
+msgstr ""
+
+#: ../views/my/files.php:235 ../views/my/files.php:294
+msgid "Ausgewählte Dateien herunterladen."
+msgstr ""
+
+#: ../views/my/files.php:246 ../views/my/files.php:300
+msgid "Zurück zu meinen Dateien"
+msgstr ""
+
+#: ../views/my/files.php:259
+msgid "Nach Semester filtern"
+msgstr ""
+
+#: ../views/my/files.php:264 ../views/my/files.php:313
+msgid "Alle"
+msgstr ""
+
+#: ../views/my/files.php:288
+msgid "Ausgewählte Dateien löschen"
+msgstr ""
+
+#: ../views/my/files.php:322
+msgid "Zuweisen"
+msgstr ""
+
+#: ../views/my/files.php:331
+msgid "Aktionen:"
+msgstr ""
+
+#: ../views/my/files.php:343
+msgid "Nach Semester filtern:"
+msgstr ""
+
+#: ../views/my/search_user.php:2
+msgid ""
+"Auf dieser Seite können Lehrende gesucht werden und zum Bearbeiten ihrer "
+"Dateien ausgewählt werden."
+msgstr ""
+
+#: ../views/my/search_user.php:5 ../Lizenzstatus.class.php:60
+msgid "Suche nach Lehrenden"
+msgstr ""
+
+#: ../views/my/search_user.php:7 ../views/my/search_user.php:19
+msgid "Name des Lehrenden"
+msgstr ""
+
+#: ../views/my/search_user.php:12 ../views/my/search.php:55
+msgid "Suchen"
+msgstr ""
+
+#: ../views/my/search_user.php:16 ../views/my/search.php:60
+msgid "Suchergebnisse"
+msgstr ""
+
+#: ../views/my/search_user.php:20 ../views/my/search.php:67
+msgid "Anzahl Dateien"
+msgstr ""
+
+#: ../views/my/search_user.php:48
+msgid "Es wurden keine Lehrenden gefunden!"
+msgstr ""
+
+#: ../views/my/selectlicense.php:31
+msgid "Speichern"
+msgstr ""
+
+#: ../views/my/search.php:1
+msgid ""
+"Auf dieser Seite können Veranstaltungen anhand deren Namen, dem Namen eines "
+"Lehrenden, einer Einrichtung und einem Semester gesucht werden."
+msgstr ""
+
+#: ../views/my/search.php:5 ../Lizenzstatus.class.php:56
+msgid "Suche nach Veranstaltungen"
+msgstr ""
+
+#: ../views/my/search.php:7 ../views/my/search.php:64
+msgid "Name der Veranstaltung"
+msgstr ""
+
+#: ../views/my/search.php:13
+msgid "Name eines Lehrenden"
+msgstr ""
+
+#: ../views/my/search.php:19
+msgid "Einrichtung"
+msgstr ""
+
+#: ../views/my/search.php:23 ../views/my/search.php:39
+msgid "alle"
+msgstr ""
+
+#: ../views/my/search.php:50
+msgid "Hinweis"
+msgstr ""
+
+#: ../views/my/search.php:51
+msgid ""
+"Da Sie keiner Einrichtung zugeordnet sind, können Sie Veranstaltungen nicht "
+"nach einer Einrichtung filtern!"
+msgstr ""
+
+#: ../views/my/search.php:65
+msgid "Lehrende"
+msgstr ""
+
+#: ../views/my/search.php:133
+msgid "Es wurden keine Suchparameter gesetzt!"
+msgstr ""
+
+#: ../views/my/search.php:135
+msgid "Es wurden keine Veranstaltungen gefunden!"
+msgstr ""
+
+#: ../views/my/search.php:140
+msgid "Dateien anzeigen"
+msgstr ""
+
+#: ../NewYear2017Cronjob.class.php:33
+msgid ""
+"Ändert den Download-Status bestimmter Lizenzen zum 1.1.2017, um den neuen "
+"Anforderungen der VG Wort gerecht zu werden."
+msgstr ""
+
+#: ../Lizenzstatus.class.php:52
+msgid "Dateien"
+msgstr ""
+
+#: ../Lizenzstatus.class.php:78
+msgid "Informationen zu Uploads von Texten"
+msgstr ""
+
+#: ../controllers/my.php:66
 msgid "Was bedeuten die Lizenzen?"
 msgstr ""
 
-#: ../controllers/my.php:147
-msgid "Ausgewählte Dateien wurden gelöscht."
+#: ../controllers/my.php:109 ../controllers/my.php:163
+msgid "Sie sind nicht dazu berechtigt, diese Seite aufzurufen!"
 msgstr ""
 
-#: ../controllers/my.php:169
+#: ../controllers/my.php:489
+msgid "Veranstaltung nicht gefunden!"
+msgstr ""
+
+#: ../controllers/my.php:666
+#, php-format
+msgid "%s Dateien wurden gelöscht."
+msgstr ""
+
+#: ../controllers/my.php:706
 msgid "Ausgewählte Dateien verändern"
 msgstr ""
 
-#: ../controllers/my.php:178
-#, php-format
-msgid "%s Dokumente verändert."
+#: ../controllers/my.php:716
+msgid "Sie sind nicht dazu berechtigt, Dateien einer Veranstaltung zu ändern!"
 msgstr ""
 
-#: ../Lizenzstatus.class.php:53
-msgid "Informationen zu Uploads von Texten"
+#: ../controllers/my.php:725
+msgid ""
+"Sie sind nicht dazu berechtigt, Dateien eines anderen Nutzers zu ändern!"
+msgstr ""
+
+#: ../controllers/my.php:747
+#, php-format
+msgid "%s Dokumente verändert."
 msgstr ""

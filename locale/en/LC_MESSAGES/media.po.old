@@ -3,27 +3,27 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-12-09 14:48+0100\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"PO-Revision-Date: 2016-11-30 18:16+0100\n"
+"Last-Translator: André Noack <noack@data-quest.de>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
-"Language: \n"
+"Language: en\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=ISO-8859-1\n"
+"Content-Type: text/plain; charset=windows-1252\n"
 "Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 1.5.4\n"
 
 #: ../views/shared/action-menu.php:16
 msgid "Aktionen"
-msgstr ""
+msgstr "actions"
 
 #: ../views/shared/action-menu.php:26 ../views/my/selectlicense.php:9
 msgid "Lizenz auswählen"
-msgstr ""
+msgstr "choose license"
 
 #: ../views/my/files.php:9
 #, php-format
@@ -36,9 +36,9 @@ msgid "insgesamt"
 msgstr ""
 
 #: ../views/my/files.php:14
-#, php-format
+#, fuzzy, php-format
 msgid "Hochgeladenen Dokumente von %s"
-msgstr ""
+msgstr "Your uploaded files"
 
 #: ../views/my/files.php:21
 msgid "Hochgeladenen Dokumente aus Veranstaltungen"
@@ -46,20 +46,20 @@ msgstr ""
 
 #: ../views/my/files.php:24
 msgid "Ihre selbst hochgeladenen Dokumente"
-msgstr ""
+msgstr "Your uploaded files"
 
 #: ../views/my/files.php:33
 msgid "Dateiname"
-msgstr ""
+msgstr "filename"
 
 #: ../views/my/files.php:35
 msgid "Veranstaltung"
-msgstr ""
+msgstr "course"
 
 #: ../views/my/files.php:36 ../views/my/search.php:35
 #: ../views/my/search.php:66
 msgid "Semester"
-msgstr ""
+msgstr "semester"
 
 #: ../views/my/files.php:39
 msgid "Nutzer"
@@ -67,40 +67,42 @@ msgstr ""
 
 #: ../views/my/files.php:41
 msgid "Datum"
-msgstr ""
+msgstr "date"
 
 #: ../views/my/files.php:42 ../NewYear2017Cronjob.class.php:24
 #: ../Lizenzstatus.class.php:27
 msgid "Lizenzstatus"
-msgstr ""
+msgstr "license state"
 
 #: ../views/my/files.php:92
 msgid "unbegrenzt"
-msgstr ""
+msgstr "unlimited"
 
 #: ../views/my/files.php:117
+#, fuzzy
 msgid "unbekannt"
-msgstr ""
+msgstr "unlimited"
 
 #: ../views/my/files.php:122
 msgid "Uhr"
-msgstr ""
+msgstr "clock"
 
 #: ../views/my/files.php:217 ../views/my/files.php:282
 msgid "Lizenzen der ausgewählten Dokumente setzen"
-msgstr ""
+msgstr "select license for choosen files"
 
 #: ../views/my/files.php:226
+#, fuzzy
 msgid "Ausgewählte Dateien löschen."
-msgstr ""
+msgstr "Delete chosen files"
 
 #: ../views/my/files.php:231 ../views/my/files.php:286
 msgid "Wirklich alle ausgewählten Dateien löschen?"
-msgstr ""
+msgstr "Confirm deletion of selected files."
 
 #: ../views/my/files.php:235 ../views/my/files.php:294
 msgid "Ausgewählte Dateien herunterladen."
-msgstr ""
+msgstr "Download chosen files."
 
 #: ../views/my/files.php:246 ../views/my/files.php:300
 msgid "Zurück zu meinen Dateien"
@@ -108,27 +110,30 @@ msgstr ""
 
 #: ../views/my/files.php:259
 msgid "Nach Semester filtern"
-msgstr ""
+msgstr "Filter for semester"
 
 #: ../views/my/files.php:264 ../views/my/files.php:313
 msgid "Alle"
-msgstr ""
+msgstr "All"
 
 #: ../views/my/files.php:288
+#, fuzzy
 msgid "Ausgewählte Dateien löschen"
-msgstr ""
+msgstr "Delete chosen files"
 
 #: ../views/my/files.php:322
 msgid "Zuweisen"
-msgstr ""
+msgstr "assign"
 
 #: ../views/my/files.php:331
+#, fuzzy
 msgid "Aktionen:"
-msgstr ""
+msgstr "actions"
 
 #: ../views/my/files.php:343
+#, fuzzy
 msgid "Nach Semester filtern:"
-msgstr ""
+msgstr "filter for semester"
 
 #: ../views/my/search_user.php:2
 msgid ""
@@ -162,7 +167,7 @@ msgstr ""
 
 #: ../views/my/selectlicense.php:31
 msgid "Speichern"
-msgstr ""
+msgstr "save"
 
 #: ../views/my/search.php:1
 msgid ""
@@ -171,12 +176,14 @@ msgid ""
 msgstr ""
 
 #: ../views/my/search.php:5 ../Lizenzstatus.class.php:56
+#, fuzzy
 msgid "Suche nach Veranstaltungen"
-msgstr ""
+msgstr "course"
 
 #: ../views/my/search.php:7 ../views/my/search.php:64
+#, fuzzy
 msgid "Name der Veranstaltung"
-msgstr ""
+msgstr "course"
 
 #: ../views/my/search.php:13
 msgid "Name eines Lehrenden"
@@ -213,8 +220,9 @@ msgid "Es wurden keine Veranstaltungen gefunden!"
 msgstr ""
 
 #: ../views/my/search.php:140
+#, fuzzy
 msgid "Dateien anzeigen"
-msgstr ""
+msgstr "filename"
 
 #: ../NewYear2017Cronjob.class.php:33
 msgid ""
@@ -223,33 +231,35 @@ msgid ""
 msgstr ""
 
 #: ../Lizenzstatus.class.php:52
+#, fuzzy
 msgid "Dateien"
-msgstr ""
+msgstr "filename"
 
 #: ../Lizenzstatus.class.php:78
 msgid "Informationen zu Uploads von Texten"
-msgstr ""
+msgstr "Informations for uploading of text"
 
 #: ../controllers/my.php:66
 msgid "Was bedeuten die Lizenzen?"
-msgstr ""
+msgstr "What do the licenses mean for you?"
 
 #: ../controllers/my.php:109 ../controllers/my.php:163
 msgid "Sie sind nicht dazu berechtigt, diese Seite aufzurufen!"
 msgstr ""
 
 #: ../controllers/my.php:489
+#, fuzzy
 msgid "Veranstaltung nicht gefunden!"
-msgstr ""
+msgstr "course"
 
 #: ../controllers/my.php:666
-#, php-format
+#, fuzzy, php-format
 msgid "%s Dateien wurden gelöscht."
-msgstr ""
+msgstr "Selected files were deleted."
 
 #: ../controllers/my.php:706
 msgid "Ausgewählte Dateien verändern"
-msgstr ""
+msgstr "Change selected files"
 
 #: ../controllers/my.php:716
 msgid "Sie sind nicht dazu berechtigt, Dateien einer Veranstaltung zu ändern!"
@@ -263,4 +273,4 @@ msgstr ""
 #: ../controllers/my.php:747
 #, php-format
 msgid "%s Dokumente verändert."
-msgstr ""
+msgstr "%s files were changed."
