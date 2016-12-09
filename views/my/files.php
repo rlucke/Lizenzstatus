@@ -21,7 +21,7 @@
             <?= dgettext('lizenzstatus', "Hochgeladenen Dokumente aus Veranstaltungen")
                 ?>&nbsp;(<?= dgettext('lizenzstatus', 'insgesamt') . ' ' . count($files)?>)
             <? else: ?>
-            <?= dgettext('lizenzstatus', "Ihre selbst hochgeladenen Dokumente") 
+            <?= dgettext('lizenzstatus', "Ihre selbst hochgeladenen Dokumente")
                 ?>&nbsp;(<?= dgettext('lizenzstatus', 'insgesamt') . ' ' . count($files)?>)
             <? endif ?>
         </caption>
@@ -100,21 +100,12 @@
                     <? endif ?>
                 <? endif ?>
                 <? if ($course_list or $course): ?>
+                <? $file_user = User::find($file->user_id); ?>
                     <td>
-                        <a href="<?= URLHelper::getLink("folder.php#anker", array(
-                            'user_id' => $file['user_id'],
-                            'data' => array(
-                                'cmd' => "tree",
-                                'open' => array(
-                                    $file['range_id'] => 1,
-                                    $file->getId() => 1
-                                )
-                            ),
-                            'open' => $file->getId()
+                        <a href="<?= URLHelper::getLink("dispatch.php/profile", array(
+                            'username' => $file_user['username']
                         )) ?>">
-                        <? $file_user = User::find($file->user_id); ?>
-
-                            <?= htmlReady($file_user ? $file_user->getFullName() : dgettext('lizenzstatus', 'unbekannt')) ?>
+                            <?= htmlReady($file_user ? $file_user->getFullName('no_title_rev') : dgettext('lizenzstatus', 'unbekannt')) ?>
                         </a>
                     </td>
                 <? endif ?>
@@ -239,7 +230,7 @@ if(version_compare($GLOBALS['SOFTWARE_VERSION'], '3.1', '>=')) {
             : Assets::image_path("icons/16/blue/download"),
         array('onClick' => "jQuery('#action').val('download'); jQuery('#action_form').removeAttr('data-dialog', '1').submit(); return false;")
     );
-    
+
     if(Request::get('cid') or Request::get('user_id') or
         !empty($_SESSION['LIZENZSTATUS_SELECTED_COURSE_IDS'])) {
         $actions->addLink(
@@ -250,7 +241,7 @@ if(version_compare($GLOBALS['SOFTWARE_VERSION'], '3.1', '>=')) {
                 : Assets::image_path('icons/16/blue/headache')
         );
     }
-    
+
     Sidebar::Get()->addWidget($actions);
 
     if(!Request::get('cid') and !Request::get('user_id') and
