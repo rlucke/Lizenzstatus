@@ -15,7 +15,7 @@
                     dgettext('lizenzstatus', "Hochgeladenen Dokumente von %s"),
                     (version_compare($GLOBALS['SOFTWARE_VERSION'], '3.1', '>=')
                     ? htmlReady($user->getFullName())
-                    : htmlReady($user->name)
+                    : htmlReady($user->vorname . ' ' . $user->nachname)
                     )
                 ) ?>&nbsp;(<?=count($files)?>)
             <? else: ?>
@@ -288,7 +288,7 @@ if(version_compare($GLOBALS['SOFTWARE_VERSION'], '3.1', '>=')) {
         . '" >' . Assets::img('icons/16/blue/download', array('size' => '16'))
         . dgettext('lizenzstatus', 'Ausgewählte Dateien herunterladen.') . '</a><br>';
 
-    if(Request::get('cid')) {
+    if(Request::get('cid') or Request::get('user_id')) {
         $action_links .= '<a href="' . PluginEngine::getLink($plugin, array(), 'my/reset') . '" >'
             . Assets::img('icons/16/blue/headache', array('class' => 'text-bottom'))
             . dgettext('lizenzstatus', 'Zurück zu meinen Dateien') . '</a><br>';

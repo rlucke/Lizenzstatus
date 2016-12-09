@@ -33,7 +33,7 @@
                     'my/files'
                 ) ?>"><?= (version_compare($GLOBALS['SOFTWARE_VERSION'], '3.1', '>='))
                     ? htmlReady($user->getFullName())
-                    : htmlReady($user->name) ?></a>
+                    : htmlReady($user->vorname . ' ' . $user->nachname) ?></a>
             </td>
             <td>
                 <? if($user_files_count[$user->id] > 0): ?>

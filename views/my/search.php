@@ -76,10 +76,33 @@
                     : htmlReady($course->name) ?></a>
             </td>
             <td>
-                <? $course_members = CourseMember::findByCourseAndStatus($course->id, 'dozent'); ?>
+                <? $db = DbManager::get();
+                //CourseMember::findByCourseAndStatus is not available in Stud.IP 2.5!
+                //StudipPDO::fetchAll and SimpleORMap::buildExisting aren't available either!
+                $statement = $db->prepare("SELECT seminar_user.*, aum.vorname,aum.nachname,aum.email,
+                    aum.username,ui.title_front,ui.title_rear
+                    FROM seminar_user
+                    LEFT JOIN auth_user_md5 aum USING (user_id)
+                    LEFT JOIN user_info ui USING (user_id)
+                    WHERE seminar_id = ? AND seminar_user.status IN(?) ORDER BY status,position,nachname");
+                
+                $statement->execute(array($course->id, 'dozent'));
+                $statement->setFetchMode(PDO::FETCH_ASSOC);
+                $course_members = array();
+                foreach($statement as $key => $row) {
+                    $new_object = new CourseMember();
+                    $new_object->setData($row, true);
+                    $new_object->setNew(false);
+                    $course_members[$key] = $new_object;
+                }
+                ?>
                 <? if($course_members): ?>
                 <? foreach($course_members as $member): ?>
-                <?= htmlReady($member->getUserFullName('short')) ?>
+                    <? if(version_compare($GLOBALS['SOFTWARE_VERSION'], '3.1', '>=')): ?>
+                        <?= htmlReady($member->getUserFullName('short')) ?>
+                    <? else: ?>
+                        <?= htmlReady($member->user->getFullName()) ?>
+                    <? endif ?>
                 <? endforeach ?>
                 <? endif ?>
             </td>

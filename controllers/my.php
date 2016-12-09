@@ -5,6 +5,7 @@ require_once 'lib/classes/PageLayout.php';
 require_once 'lib/classes/searchtypes/SeminarSearch.class.php';
 require_once 'lib/datei.inc.php';
 require_once 'lib/models/StudipDocument.class.php';
+require_once 'lib/models/Institute.class.php';
 
 
 //for Stud.IP 2.5 compatibility:
@@ -176,6 +177,19 @@ class MyController extends PluginController {
         //semester selector is always filled:
         $this->available_semesters = Semester::getAll();
 
+        
+        $this->available_institutes = Institute::findBySql(
+            "institut_id IN 
+            (SELECT institut_id FROM user_inst
+            WHERE user_id = :user_id)
+            GROUP BY name ORDER BY name ASC",
+            array(
+                'user_id' => $GLOBALS['user']->id
+            )
+        );
+        
+        /*
+        //does not work with Stud.IP 2.5:
         $this->available_institutes = Institute::findBySql(
             "INNER JOIN user_inst
             ON
@@ -184,10 +198,10 @@ class MyController extends PluginController {
             user_inst.user_id = :user_id
             ORDER BY name ASC",
             array(
-                'user_id' => User::findCurrent()->id
+                'user_id' => $GLOBALS['user']->id
             )
         );
-
+        */
         
         if(!$this->semester_id and !$this->institute_id and !$this->course_name
             and !$this->user_name) {
@@ -199,7 +213,7 @@ class MyController extends PluginController {
         
         $institute_id_list = array();
         
-        $sql = '';
+        $sql = 'SELECT * FROM seminare ';
         $sql_params = array();
         
         
@@ -242,9 +256,14 @@ class MyController extends PluginController {
             //In case no institute is given we must limit the search results
             //to the institutes where the user is admin
 
-            $current_user = User::findCurrent();
+            $current_user_id = $GLOBALS['user']->id; //for Stud.IP 2.5 compatibility
 
-            $institute_memberships = $current_user->institute_memberships;
+            $institute_memberships = InstituteMember::findBySql(
+                'user_id = :user_id',
+                array(
+                    'user_id' => $current_user_id
+                )
+            );
 
             if($institute_memberships) {
 
@@ -303,8 +322,23 @@ class MyController extends PluginController {
         
         $sql .= "GROUP BY name ORDER BY seminare.name ASC";
         
+        //findBySql doesn't support joins in Stud.IP 2.5. We must build our
+        //courses "the hard way":
         
-        $this->courses = Course::findBySql($sql, $sql_params);
+        $db = DBManager::get();
+        
+        $statement = $db->prepare($sql);
+        $statement->execute($sql_params);
+        $statement->setFetchMode(PDO::FETCH_ASSOC);
+        $this->courses = array();
+        foreach($statement as $key => $row) {
+            $new_object = new Course();
+            $new_object->setData($row, true);
+            $new_object->setNew(false);
+            $this->courses[$key] = $new_object;
+        }
+        
+        //$this->courses = Course::findBySql($sql, $sql_params);
         
         
         $this->search_was_executed = true;
