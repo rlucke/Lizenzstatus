@@ -255,7 +255,8 @@ if(version_compare($GLOBALS['SOFTWARE_VERSION'], '3.1', '>=')) {
     
     Sidebar::Get()->addWidget($actions);
 
-    if(!Request::get('cid') and !Request::get('user_id') and empty($_SESSION['LIZENZSTATUS_SELECTED_COURSE_IDS'])) {
+    if(!Request::get('cid') and !Request::get('user_id') and
+        empty($_SESSION['LIZENZSTATUS_SELECTED_COURSE_IDS'])) {
         $semester_select = new SelectWidget(
             dgettext('lizenzstatus', "Nach Semester filtern"),
             PluginEngine::getLink($plugin, array(), "my/files"),
@@ -294,13 +295,15 @@ if(version_compare($GLOBALS['SOFTWARE_VERSION'], '3.1', '>=')) {
         . '" >' . Assets::img('icons/16/blue/download', array('size' => '16'))
         . dgettext('lizenzstatus', 'Ausgewählte Dateien herunterladen.') . '</a><br>';
 
-    if(Request::get('cid') or Request::get('user_id')) {
+    if(Request::get('cid') or Request::get('user_id') or
+        !empty($_SESSION['LIZENZSTATUS_SELECTED_COURSE_IDS'])) {
         $action_links .= '<a href="' . PluginEngine::getLink($plugin, array(), 'my/reset') . '" >'
             . Assets::img('icons/16/blue/headache', array('class' => 'text-bottom'))
             . dgettext('lizenzstatus', 'Zurück zu meinen Dateien') . '</a><br>';
     }
 
-    if(!Request::get('cid') and !Request::get('user_id')) {
+    if(!Request::get('cid') and !Request::get('user_id') and
+        empty($_SESSION['LIZENZSTATUS_SELECTED_COURSE_IDS'])) {
         $semesters = array_reverse(Semester::getAll());
 
         $semester_select = '<form novalidate="novalidate" action="'
