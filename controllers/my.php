@@ -70,6 +70,22 @@ class MyController extends PluginController {
             false,
             array('data-dialog' => 1));
             }
+        
+        //Determine minimum permissions for mass file deletion (if enabled):
+        
+        //If the minimum perms for mass file deletion are set 
+        //the current user must have them. If no minimum permissions are set
+        //the user must at least be admin.
+        
+        $this->mass_file_deletion_min_perms = 'admin';
+        
+        if(Config::get()->ALLOW_MASS_FILE_DELETING) {
+            //mass file deletion is turned on
+            
+            if(Config::get()->MASS_FILE_DELETION_MIN_PERMS) {
+                $this->mass_file_deletion_min_perms = Config::get()->MASS_FILE_DELETION_MIN_PERMS;
+            }
+        }
     }
 
 
@@ -648,27 +664,57 @@ class MyController extends PluginController {
 
 
             if (Request::get("action") === "delete") {
-                $deleted_files_count = 0;
-                foreach (Request::getArray("d") as $file_id) {
-                    $file = new StudipDocument($file_id);
-                    if (
-                        ($file->checkAccess($GLOBALS['user']->id) &&
-                            $file['user_id'] === $GLOBALS['user']->id) ||
-                            (($course or !empty($_SESSION['LIZENZSTATUS_SELECTED_COURSE_IDS']))
-                                && $perm->have_perm('admin')) ||
-                            ($user && ($user->perms == 'dozent') && $perm->have_perm('admin'))
-                        ){
-                        $file->delete();
-                        $deleted_files_count++;
+                if(Config::get()->ALLOW_MASS_FILE_DELETING and
+                    $perm->have_Perm($this->mass_file_deletion_min_perms)) {
+                    //Mass file deletion is turned on and the user has 
+                    //the required permissions.
+                    $deleted_files_count = 0;
+                    foreach (Request::getArray("d") as $file_id) {
+                        $file = new StudipDocument($file_id);
+                        if (
+                            ($file->checkAccess($GLOBALS['user']->id) &&
+                                $file['user_id'] === $GLOBALS['user']->id) ||
+                                (($course or !empty($_SESSION['LIZENZSTATUS_SELECTED_COURSE_IDS']))
+                                    && $perm->have_perm('admin')) ||
+                                ($user && ($user->perms == 'dozent') && $perm->have_perm('admin'))
+                            ){
+                            $file->delete();
+                            $deleted_files_count++;
+                        }
+                    }
+                    PageLayout::postMessage(MessageBox::success(
+                        sprintf(
+                            dgettext('lizenzstatus', "%s Dateien wurden gelöscht."),
+                            $deleted_files_count
+                        )
+                    ));
+                } else {
+                    //Either mass file deletion isn't turned on or
+                    //the user hasn't got the required permissions.
+                    
+                    if(Config::get()->ALLOW_MASS_FILE_DELETING) {
+                        //The user doesn't have the required permissions.
+                        PageLayout::postMessage(
+                            MessageBox::error(
+                                dgettext(
+                                    'lizenzstatus',
+                                    'Sie sind nicht dazu berechtigt, Dateien massenhaft zu löschen!'
+                                )
+                            )
+                        );
+                    } else {
+                        //Mass file deletion is turned off.
+                        PageLayout::postMessage(
+                            MessageBox::error(
+                                dgettext(
+                                    'lizenzstatus',
+                                    'Das massenhafte Löschen von Dateien ist nicht eingeschaltet! Es kann nicht gelöscht werden!'
+                                )
+                            )
+                        );
+                                
                     }
                 }
-                PageLayout::postMessage(MessageBox::success(
-                    sprintf(
-                        dgettext('lizenzstatus', "%s Dateien wurden gelöscht."),
-                        $deleted_files_count
-                    )
-                ));
-
 
                 $this->redirect(
                     PluginEngine::getUrl(

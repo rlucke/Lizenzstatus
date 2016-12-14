@@ -199,6 +199,9 @@
 
 
 <?
+
+global $perm;
+
 //the sidebar is available since Stud.IP 3.1. For older versions we must build
 //an infobox instead.
 if(version_compare($GLOBALS['SOFTWARE_VERSION'], '3.1', '>=')) {
@@ -212,7 +215,10 @@ if(version_compare($GLOBALS['SOFTWARE_VERSION'], '3.1', '>=')) {
             : $plugin->getPluginURL()."/assets/license.svg",
         array('onclick' => "jQuery('#action').val('selectlicense'); jQuery('#action_form').attr('data-dialog', '1').submit(); return false;")
     );
-    if (Config::get()->ALLOW_MASS_FILE_DELETING) {
+    
+    
+    if (Config::get()->ALLOW_MASS_FILE_DELETING and 
+        $perm->have_perm($mass_file_deletion_min_perms)) {
         $actions->addLink(
             dgettext('lizenzstatus', "Ausgewählte Dateien löschen."),
             "#",
@@ -272,7 +278,8 @@ if(version_compare($GLOBALS['SOFTWARE_VERSION'], '3.1', '>=')) {
             )
         . dgettext('lizenzstatus', 'Lizenzen der ausgewählten Dokumente setzen') . '</a><br>';
 
-    if(Config::get()->ALLOW_MASS_FILE_DELETING) {
+    if(Config::get()->ALLOW_MASS_FILE_DELETING and
+        $perm->have_perm($mass_file_deletion_min_perms)) {
         $action_links .= '<a href="#" onclick="'
                 . "if (window.confirm('". dgettext('lizenzstatus', "Wirklich alle ausgewählten Dateien löschen?") ."')) { jQuery('#action').val('delete'); jQuery('#action_form').removeAttr('data-dialog', '1').submit(); } return false;"
             . '" >' . Assets::img('icons/16/blue/trash', array('size' => '16'))
