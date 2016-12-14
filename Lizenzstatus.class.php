@@ -18,26 +18,26 @@ class Lizenzstatus extends StudIPPlugin implements SystemPlugin {
         parent::__construct();
         bindtextdomain('lizenzstatus', dirname(__FILE__).'/locale');
         bind_textdomain_codeset('lizenzstatus', 'windows-1252');
-        
+
         if(!Request::get('cid')) {
             URLHelper::removeLinkParam('cid');
         }
-        
-        
+
+
         $nav = new Navigation(dgettext('lizenzstatus', "Lizenzstatus"));
         if (version_compare($GLOBALS['SOFTWARE_VERSION'], "3.4", ">=")) {
             $nav->setImage(
                 Icon::create("files", "navigation")
             );
         } else {
-            if(version_compare($GLOBALS['SOFTWARE_VERSION'], '3.0', '>=')) {
+            if(version_compare($GLOBALS['SOFTWARE_VERSION'], '3.1', '>=')) {
                 $nav->setImage(
                     $this->getPluginURL()."/assets/files_lightblue.svg"
                 );
             } else {
                 //special icon for Stud.IP 2.5:
                 $nav->setImage(
-                    $this->getPluginURL()."/assets/files_25.svg"
+                    $this->getPluginURL()."/assets/lizenzstatus.png"
                 );
             }
         }
@@ -45,14 +45,14 @@ class Lizenzstatus extends StudIPPlugin implements SystemPlugin {
         $this->addStylesheet("assets/actionmenu.less");
         PageLayout::addScript($this->getPluginURL()."/assets/actionmenu.js");
         Navigation::addItem("/myprotectedfiles", $nav);
-        
+
         global $perm;
         if($perm->have_perm('admin')) {
             //This feature is only available for admins:
             $subnav = new Navigation(dgettext('lizenzstatus', 'Dateien'));
             $subnav->setURL(PluginEngine::getURL($this, array(), 'my/files'));
             $nav->addSubNavigation('files', $subnav);
-                    
+
             $subnav = new Navigation(dgettext('lizenzstatus', 'Suche nach Veranstaltungen'));
             $subnav->setUrl(PluginEngine::getURL($this, array(), 'my/search'));
             $nav->addSubNavigation('search', $subnav);
@@ -62,8 +62,8 @@ class Lizenzstatus extends StudIPPlugin implements SystemPlugin {
                 $nav->addSubNavigation('search_user', $subnav);
             }
         }
-        
-        
+
+
         if (((($GLOBALS['i_page'] === "folder.php") && $GLOBALS['perm']->have_studip_perm("tutor", $_SESSION['SessionSeminar']))
                     || (stripos($_SERVER['REQUEST_URI'], "plugins.php/myprotectedfiles") !== false))
                 && !$_SESSION['HAS_SEEN_52A_INFO']

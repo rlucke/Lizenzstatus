@@ -17,8 +17,10 @@ $attributes = function (array $attributes) {
         <img src="<?= htmlReady($icon) ?>" width="20px" height="20px" class="license">
         <? if (version_compare($GLOBALS['SOFTWARE_VERSION'], "3.4", ">=")) : ?>
             <?= Icon::create("decline", "clickable")->asImg("20px", array('class' => "decline"))  ?>
-        <? else : ?>
+        <? elseif (version_compare($GLOBALS['SOFTWARE_VERSION'], "3.2", ">=")) : ?>
             <?= Assets::img("icons/20/blue/decline", array('class' => "decline")) ?>
+        <? else : ?>
+            <?= Assets::img($GLOBALS['ABSOLUTE_URI_STUDIP'] . 'plugins_packages/data-quest/Lizenzstatus/assets/decline.svg', array('class' => "decline")) ?>
         <? endif ?>
     </div>
     <div class="action-menu-content">

@@ -146,14 +146,14 @@
 <style>
     .filelist th.sortasc {
         padding-left: 20px;
-        background-image: url(<?= Assets::image_path("icons/blue/arr_1down.svg") ?>);
+        background-image: url(<?= $GLOBALS['ABSOLUTE_URI_STUDIP'] . 'plugins_packages/data-quest/Lizenzstatus/assets/arr_1down.svg' ?>);
         background-repeat: no-repeat;
         background-position: left center;
         background-size: 16px 16px;
     }
     .filelist th.sortdesc {
         padding-left: 20px;
-        background-image: url(<?= Assets::image_path("icons/blue/arr_1up.svg") ?>);
+        background-image: url(<?= $GLOBALS['ABSOLUTE_URI_STUDIP'] . 'plugins_packages/data-quest/Lizenzstatus/assets/arr_1up.svg' ?>);
         background-repeat: no-repeat;
         background-position: left center;
         background-size: 16px 16px;
