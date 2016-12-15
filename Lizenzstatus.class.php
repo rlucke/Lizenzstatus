@@ -65,7 +65,7 @@ class Lizenzstatus extends StudIPPlugin implements SystemPlugin {
 
 
         if (((($GLOBALS['i_page'] === "folder.php") && $GLOBALS['perm']->have_studip_perm("tutor", $_SESSION['SessionSeminar']))
-                    || (stripos($_SERVER['REQUEST_URI'], "plugins.php/myprotectedfiles") !== false))
+                    || (stripos($_SERVER['REQUEST_URI'], "plugins.php/lizenzstatus") !== false))
                 && !$_SESSION['HAS_SEEN_52A_INFO']
                 && trim(Config::get()->INFO_TEXT_52A)) {
             PageLayout::addBodyElements('
