@@ -28,7 +28,6 @@ class MyController extends PluginController {
     function before_filter(&$action, &$args)
     {
         parent::before_filter($action, $args);
-        Navigation::activateItem("/myprotectedfiles");
 
         $this->formclass = version_compare($GLOBALS['SOFTWARE_VERSION'], "3.5", ">=") ? "default" : "studip_form";
 
@@ -111,11 +110,6 @@ class MyController extends PluginController {
 
     public function search_user_action()
     {
-        Navigation::activateItem("/myprotectedfiles");
-        if(Navigation::hasItem("/myprotectedfiles/search_user")) {
-            Navigation::activateItem("/myprotectedfiles/search_user");
-        }
-
         URLHelper::removeLinkParam('cid');
 
         global $perm;
@@ -165,11 +159,6 @@ class MyController extends PluginController {
 
     public function search_action()
     {
-        Navigation::activateItem("/myprotectedfiles");
-        if(Navigation::hasItem("/myprotectedfiles/search")) {
-            Navigation::activateItem("/myprotectedfiles/search");
-        }
-
         URLHelper::removeLinkParam('user_id');
 
         global $perm;
@@ -404,10 +393,6 @@ class MyController extends PluginController {
         }
 
 
-        if(Navigation::hasItem("/myprotectedfiles/files")) {
-            Navigation::activateItem("/myprotectedfiles/files");
-        }
-
         PageLayout::addScript($this->plugin->getPluginURL()."/assets/jquery.tablesorter-2.22.5.js");
 
         $course_id_list = Request::getArray('course_id_list', array());
@@ -415,7 +400,35 @@ class MyController extends PluginController {
             $course_id_list = $_SESSION['LIZENZSTATUS_SELECTED_COURSE_IDS'];
         }
 
-        if (Request::option("semester_id")) {
+        $this->show_files = Request::option('show_files');
+        if ($this->show_files == 'all') {
+            URLHelper::addLinkParam('show_files', $this->show_files);
+            URLHelper::addLinkParam('semester_id', Request::option('semester_id'));
+            $semester = Semester::find(Request::option("semester_id"));
+            if ($semester) {
+                $semester_filter_sql = "AND seminare.start_time <= :beginn AND (:beginn <= start_time + duration_time OR duration_time = -1)";
+            }
+            $statement = DBManager::get()->prepare("
+                    SELECT dokumente.*
+                    FROM dokumente JOIN seminare USING(seminar_id) JOIN seminar_user USING(seminar_id)
+                    WHERE seminar_user.user_id = :user_id AND seminar_user.status IN ('dozent', 'tutor')
+                        $semester_filter_sql AND dokumente.url = ''
+                    ORDER BY mkdate DESC
+            ");
+            $statement->execute(array(
+                'user_id' => $GLOBALS['user']->id,
+                'beginn' => $semester['beginn']
+            ));
+            $documents_data = $statement->fetchAll(PDO::FETCH_ASSOC);
+            $this->files = array();
+            foreach ($documents_data as $key => $row) {
+                //SORM::buildExisting and SORM::build are not available in Stud.IP 2.5:
+                $this->files[$key] = new StudipDocument();
+                $this->files[$key]->setData($row, false);
+                $this->files[$key]->setNew(false);
+            }
+        } elseif (Request::option("semester_id")) {
+            URLHelper::addLinkParam('semester_id', Request::option('semester_id'));
             $semester = Semester::find(Request::option("semester_id"));
             $statement = DBManager::get()->prepare("
                 SELECT dokumente.*
@@ -613,6 +626,28 @@ class MyController extends PluginController {
                 $this->files[$key]->setNew(false);
             }
 
+        }
+        if (Request::option('file_type')) {
+            URLHelper::addLinkParam('file_type', Request::option('file_type'));
+            $suffix_list = array(
+                'pdf' => '/\.pdf$/i',
+                'ppt' => '/\.pptx?$/i',
+                'doc' => '/\.(docx?|rtf)$/i',
+                'zip' => '/\.(zip|7z)$/i',
+            );
+            foreach ($this->files as $key => $file) {
+                if (!preg_match($suffix_list[Request::option('file_type')], $file['filename'])) {
+                    unset($this->files[$key]);
+                }
+            }
+        }
+        if (Request::option('license_id') != '') {
+            URLHelper::addLinkParam('license_id', Request::option('license_id'));
+            foreach ($this->files as $key => $file) {
+                if ($file['protected'] != Request::int('license_id')) {
+                    unset($this->files[$key]);
+                }
+            }
         }
         $statement = DBManager::get()->prepare("
             SELECT * FROM document_licenses ORDER BY license_id <> 2 DESC, license_id ASC

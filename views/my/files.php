@@ -20,6 +20,8 @@
             <? elseif($course_list): ?>
             <?= dgettext('lizenzstatus', "Hochgeladenen Dokumente aus Veranstaltungen")
                 ?>&nbsp;(<?= dgettext('lizenzstatus', 'insgesamt') . ' ' . count($files)?>)
+            <? elseif ($show_files == 'all'): ?>
+            <?= dgettext('lizenzstatus', "Dokumente in Ihren Veranstaltungen") ?>&nbsp;(<?=count($files)?>)
             <? else: ?>
             <?= dgettext('lizenzstatus', "Ihre selbst hochgeladenen Dokumente")
                 ?>&nbsp;(<?= dgettext('lizenzstatus', 'insgesamt') . ' ' . count($files)?>)
@@ -31,11 +33,12 @@
                     <input type="checkbox" data-proxyfor=".filelist :checkbox.file">
                 </th>
                 <th><a><?= dgettext('lizenzstatus', "Dateiname") ?></a></th>
+                <th><a><?= dgettext('lizenzstatus', "Ordner") ?></a></th>
                 <? if ($course_list or !$course): ?>
                 <th><a><?= dgettext('lizenzstatus', "Veranstaltung") ?></a></th>
                 <th><a><?= dgettext('lizenzstatus', "Semester") ?></a></th>
                 <? endif ?>
-                <? if ($course_list or $course): ?>
+                <? if ($course_list or $course or $show_files == 'all'): ?>
                 <th><a><?= dgettext('lizenzstatus', 'Nutzer') ?></a></th>
                 <? endif ?>
                 <th><a><?= dgettext('lizenzstatus', "Datum") ?></a></th>
@@ -63,6 +66,14 @@
                         <?= htmlReady($file['name']) ?>
                     <? if ($access) : ?>
                     </a>
+                    <? endif ?>
+                </td>
+                <td>
+                    <? $document_tree = TreeAbstract::GetInstance('StudipDocumentTree', array('range_id' => $file['seminar_id'])) ?>
+                    <? $document_path = $document_tree->getShortPath($file['range_id'], 0, '>', 1) ?>
+                    <?= $document_tree->getValue($file['range_id'], 'name') ?>
+                    <? if (strpos($document_path, ' > ') !== false) : ?>
+                        <?= tooltipIcon($document_path) ?>
                     <? endif ?>
                 </td>
                 <? if ($course_list or !$course): ?>
@@ -99,7 +110,7 @@
                         <td data-timestamp="0">-</td>
                     <? endif ?>
                 <? endif ?>
-                <? if ($course_list or $course): ?>
+                <? if ($course_list or $course or $show_files == 'all'): ?>
                 <? $file_user = User::find($file->user_id); ?>
                     <td>
                         <a href="<?= URLHelper::getLink("dispatch.php/profile", array(
@@ -267,6 +278,50 @@ if(version_compare($GLOBALS['SOFTWARE_VERSION'], '3.1', '>=')) {
             ));
         }
         Sidebar::Get()->addWidget($semester_select);
+
+        $file_type_select = new SelectWidget(
+            dgettext('lizenzstatus', "Nach Dateityp filtern"),
+            PluginEngine::getLink($plugin, array(), "my/files"),
+            "file_type"
+        );
+        $file_types = array(
+            ''    => dgettext('lizenzstatus', 'Alle'),
+            'pdf' => dgettext('lizenzstatus', 'PDF (.pdf)'),
+            'ppt' => dgettext('lizenzstatus', 'PowerPoint (.ppt, .pptx)'),
+            'doc' => dgettext('lizenzstatus', 'Word (.doc, .docx, .rtf)'),
+            'zip' => dgettext('lizenzstatus', 'ZIP (.zip, .7z)'),
+        );
+        foreach ($file_types as $file_type => $file_type_name) {
+            $file_type_select->addElement(new SelectElement(
+                $file_type,
+                $file_type_name,
+                Request::option('file_type') === $file_type
+            ));
+        }
+        Sidebar::Get()->addWidget($file_type_select);
+
+        $license_select = new SelectWidget(
+            dgettext('lizenzstatus', "Nach Lizenzstatus filtern"),
+            PluginEngine::getLink($plugin, array(), "my/files"),
+            "license_id"
+        );
+        $license_select->addElement(new SelectElement("", dgettext('lizenzstatus', "Alle"), false));
+        foreach ($licenses as $license) {
+            $license_select->addElement(new SelectElement(
+                $license['license_id'],
+                $license['name'],
+                Request::option('license_id') === $license['license_id']
+            ));
+        }
+        Sidebar::Get()->addWidget($license_select);
+
+        if (!$GLOBALS['perm']->have_perm('admin')) {
+            $show_files_select = new OptionsWidget();
+            $show_files_select->addCheckbox(dgettext('lizenzstatus', "Dokumente aller Nutzer anzeigen"), $show_files,
+                PluginEngine::getLink($plugin, array('show_files' => 'all'), "my/files"),
+                PluginEngine::getLink($plugin, array('show_files' => null), "my/files"));
+            Sidebar::Get()->addWidget($show_files_select);
+        }
     }
 } else {
     //code for Stud.IP 2.5 and 3.0:

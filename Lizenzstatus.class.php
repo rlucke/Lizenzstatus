@@ -24,7 +24,7 @@ class Lizenzstatus extends StudIPPlugin implements SystemPlugin {
         }
 
 
-        $nav = new Navigation(dgettext('lizenzstatus', "Lizenzstatus"));
+        $nav = new AutoNavigation(dgettext('lizenzstatus', "Lizenzstatus"));
         if (version_compare($GLOBALS['SOFTWARE_VERSION'], "3.4", ">=")) {
             $nav->setImage(
                 Icon::create("files", "navigation")
@@ -41,23 +41,28 @@ class Lizenzstatus extends StudIPPlugin implements SystemPlugin {
                 );
             }
         }
+        $nav_root = '';
+        if (strpos($GLOBALS['STUDIP_INSTALLATION_ID'], 'unios') === 0) {
+            $nav_root = 'browse';
+            $nav->setImage(null);
+        }
         $nav->setURL(PluginEngine::getURL($this, array(), "my/files"));
         $this->addStylesheet("assets/actionmenu.less");
         PageLayout::addScript($this->getPluginURL()."/assets/actionmenu.js");
-        Navigation::addItem("/myprotectedfiles", $nav);
+        Navigation::addItem("{$nav_root}/myprotectedfiles", $nav);
 
         global $perm;
         if($perm->have_perm('admin')) {
             //This feature is only available for admins:
-            $subnav = new Navigation(dgettext('lizenzstatus', 'Dateien'));
+            $subnav = new AutoNavigation(dgettext('lizenzstatus', 'Dateien'));
             $subnav->setURL(PluginEngine::getURL($this, array(), 'my/files'));
             $nav->addSubNavigation('files', $subnav);
 
-            $subnav = new Navigation(dgettext('lizenzstatus', 'Suche nach Veranstaltungen'));
+            $subnav = new AutoNavigation(dgettext('lizenzstatus', 'Suche nach Veranstaltungen'));
             $subnav->setUrl(PluginEngine::getURL($this, array(), 'my/search'));
             $nav->addSubNavigation('search', $subnav);
             if($perm->have_perm('root')) {
-                $subnav = new Navigation(dgettext('lizenzstatus', 'Suche nach Lehrenden'));
+                $subnav = new AutoNavigation(dgettext('lizenzstatus', 'Suche nach Lehrenden'));
                 $subnav->setUrl(PluginEngine::getURL($this, array(), 'my/search_user'));
                 $nav->addSubNavigation('search_user', $subnav);
             }
